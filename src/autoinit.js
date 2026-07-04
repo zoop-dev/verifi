@@ -13,12 +13,12 @@ import { runChallenge } from './challenge/full.js';
     if (!_botCheckEnabled || state._verified) return;
 
     try {
-      if (sessionStorage.getItem('_st4ts_blocked') === '1') {
+      if (sessionStorage.getItem('_vf_blocked') === '1') {
         if (!d.body) { setTimeout(_vautoinit, 30); return; }
         var gs = d.createElement('style'), g = d.createElement('div');
-        gs.textContent = '#_stg{position:fixed;inset:0;z-index:2147483647;background:#070a0e;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}';
+        gs.textContent = '#_vfgate{position:fixed;inset:0;z-index:2147483647;background:#070a0e;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}';
         d.head.appendChild(gs);
-        g.id = '_stg'; g.innerHTML = '<div style="background:#0c1018;border:0.5px solid rgba(239,68,68,.15);border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center"><p style="font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px">access blocked</p><p style="font-size:11px;color:#3d4f63;line-height:1.65;margin:0">close this tab and reopen to try again.</p></div>';
+        g.id = '_vfgate'; g.innerHTML = '<div style="background:#0c1018;border:0.5px solid rgba(239,68,68,.15);border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center"><p style="font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px">access blocked</p><p style="font-size:11px;color:#3d4f63;line-height:1.65;margin:0">close this tab and reopen to try again.</p></div>';
         _vlock(); d.body.appendChild(g); return;
       }
     } catch (e) {}

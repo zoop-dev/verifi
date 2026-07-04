@@ -1,8 +1,3 @@
-// functions/verify.js
-// Site servers POST here to validate a verifi token
-// POST { token: "vrf1...." }
-// Returns { valid, site_id, probability, confidence, issued_at, expires_at }
-
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
@@ -72,6 +67,7 @@ export async function onRequestPost({ request, env }) {
     return new Response(JSON.stringify({
       valid: true,
       site_id: payload.site_id,
+      domain: payload.domain,
       probability: payload.p,
       confidence: payload.c,
       issued_at: payload.iat,

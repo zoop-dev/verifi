@@ -27,9 +27,9 @@ w.verifi = {
     var threshold = (opts && opts.threshold != null) ? opts.threshold : _vCfg.threshold;
     var onPass = opts && opts.onPass;
     var onFail = opts && opts.onFail;
-    lsSet('_st4ts_v', '0');
+    lsSet('_vf_v', '0');
     state._verified = false;
-    try { sessionStorage.removeItem('_st4ts_blocked'); sessionStorage.removeItem('_st4ts_rc'); } catch (e) {}
+    try { sessionStorage.removeItem('_vf_blocked'); sessionStorage.removeItem('_vf_rc'); } catch (e) {}
     var tier = _getTier();
     var pass = function () {
       _vupdSc();
@@ -53,8 +53,8 @@ w.verifi = {
     });
   },
   botCheck: function (autoFail) {
-    lsSet('_st4ts_v', '0');
-    try { sessionStorage.removeItem('_st4ts_blocked'); sessionStorage.removeItem('_st4ts_rc'); } catch (e) {}
+    lsSet('_vf_v', '0');
+    try { sessionStorage.removeItem('_vf_blocked'); sessionStorage.removeItem('_vf_rc'); } catch (e) {}
     state._verified = false; state._isBot = false;
     if (autoFail === true) state._forceFailFirst = true;
     var pass = function () { console.log('%c[verifi]%c check passed', 'color:#00c8ff;font-weight:700', 'color:#48bb78'); };
@@ -64,23 +64,23 @@ w.verifi = {
     else { state._isBot = true; runChallenge(pass, fail); }
   },
   fullscreenTest: function (autoFail) {
-    lsSet('_st4ts_v', '0');
-    try { sessionStorage.removeItem('_st4ts_blocked'); sessionStorage.removeItem('_st4ts_rc'); } catch (e) {}
+    lsSet('_vf_v', '0');
+    try { sessionStorage.removeItem('_vf_blocked'); sessionStorage.removeItem('_vf_rc'); } catch (e) {}
     state._verified = false; state._isBot = true;
     if (autoFail === true) state._forceFailFirst = true;
-    var g = d.getElementById('_stg'); if (g && g.parentNode) g.parentNode.removeChild(g);
-    var GCSS = '#_stg{position:fixed;inset:0;z-index:2147483647;background:#070a0e;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:20px}@keyframes _stg_spin{to{transform:rotate(360deg)}}@keyframes _stg_fi{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}#_stg_card{background:#0c1018;border:0.5px solid #1e2738;border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center;animation:_stg_fi .25s ease;user-select:none}#_stg_icon{width:44px;height:44px;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#00c8ff}#_stg_spinner{width:20px;height:20px;border:2px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_stg_spin .8s linear infinite}#_stg_title{font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px}#_stg_sub{font-size:11px;color:#3d4f63;margin:0 0 20px;line-height:1.65}#_stg_bw{height:2px;background:#111820;border-radius:1px;overflow:hidden}#_stg_bar{height:100%;background:#00c8ff;border-radius:1px;width:0%;transition:width .4s ease,background .3s}#_stg_attr{font-size:10px;color:#1e2738;margin-top:18px}#_stg_attr a{color:#2d3748;text-decoration:underline}';
+    var g = d.getElementById('_vfgate'); if (g && g.parentNode) g.parentNode.removeChild(g);
+    var GCSS = '#_vfgate{position:fixed;inset:0;z-index:2147483647;background:#070a0e;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:20px}@keyframes _vfgate_spin{to{transform:rotate(360deg)}}@keyframes _vfgate_fi{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}#_vfgate_card{background:#0c1018;border:0.5px solid #1e2738;border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center;animation:_vfgate_fi .25s ease;user-select:none}#_vfgate_icon{width:44px;height:44px;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#00c8ff}#_vfgate_spinner{width:20px;height:20px;border:2px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_vfgate_spin .8s linear infinite}#_vfgate_title{font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px}#_vfgate_sub{font-size:11px;color:#3d4f63;margin:0 0 20px;line-height:1.65}#_vfgate_bw{height:2px;background:#111820;border-radius:1px;overflow:hidden}#_vfgate_bar{height:100%;background:#00c8ff;border-radius:1px;width:0%;transition:width .4s ease,background .3s}#_vfgate_attr{font-size:10px;color:#1e2738;margin-top:18px}#_vfgate_attr a{color:#2d3748;text-decoration:underline}';
     var gs = d.createElement('style'); gs.textContent = GCSS; d.head.appendChild(gs);
-    var g2 = d.createElement('div'); g2.id = '_stg';
-    g2.innerHTML = '<div id="_stg_card"><div id="_stg_icon"><div id="_stg_spinner"></div></div><p id="_stg_title">checking your browser</p><p id="_stg_sub">this may take a moment</p><div id="_stg_bw"><div id="_stg_bar"></div></div><p id="_stg_attr">protected by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p></div>';
+    var g2 = d.createElement('div'); g2.id = '_vfgate';
+    g2.innerHTML = '<div id="_vfgate_card"><div id="_vfgate_icon"><div id="_vfgate_spinner"></div></div><p id="_vfgate_title">checking your browser</p><p id="_vfgate_sub">this may take a moment</p><div id="_vfgate_bw"><div id="_vfgate_bar"></div></div><p id="_vfgate_attr">protected by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p></div>';
     _vlock(); d.body.appendChild(g2);
-    var bar = d.getElementById('_stg_bar'), prog = 0;
+    var bar = d.getElementById('_vfgate_bar'), prog = 0;
     var pi = setInterval(function () { prog = Math.min(80, prog + (Math.random() * 6 + 2)); if (bar) bar.style.width = prog + '%'; }, 250);
     setTimeout(function () {
       clearInterval(pi);
       runChallenge(
         function () { if (bar) bar.style.width = '100%'; setTimeout(function () { g2.style.transition = 'opacity .35s'; g2.style.opacity = '0'; _vunlock(); setTimeout(function () { if (g2.parentNode) g2.parentNode.removeChild(g2); gs.remove(); }, 360); }, 250); },
-        function () { clearInterval(pi); if (bar) { bar.style.width = '100%'; bar.style.background = '#ef4444'; } var t = d.getElementById('_stg_title'), s = d.getElementById('_stg_sub'); if (t) t.textContent = 'access denied'; if (s) s.textContent = 'your browser did not pass our security check.'; }
+        function () { clearInterval(pi); if (bar) { bar.style.width = '100%'; bar.style.background = '#ef4444'; } var t = d.getElementById('_vfgate_title'), s = d.getElementById('_vfgate_sub'); if (t) t.textContent = 'access denied'; if (s) s.textContent = 'your browser did not pass our security check.'; }
       );
     }, 1000);
   },

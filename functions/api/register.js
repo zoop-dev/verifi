@@ -1,4 +1,5 @@
 import { SB_URL, SB_KEY } from '../_config.js';
+import { normalizeDomain } from '../_sites.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -22,6 +23,10 @@ export async function onRequestPost({ request }) {
     if (!name || !name.trim()) {
       return new Response(JSON.stringify({ error: 'name required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
+    const normalizedDomain = normalizeDomain(domain);
+    if (!normalizedDomain) {
+      return new Response(JSON.stringify({ error: 'valid domain required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
+    }
 
     const id = uid();
     const res = await fetch(`${SB_URL}/rest/v1/verifi_sites`, {
@@ -35,7 +40,7 @@ export async function onRequestPost({ request }) {
       body: JSON.stringify({
         id,
         name: name.trim().slice(0, 100),
-        domain: (domain || '').trim().slice(0, 200),
+        domain: normalizedDomain,
         created_at: new Date().toISOString(),
       }),
     });
@@ -45,7 +50,7 @@ export async function onRequestPost({ request }) {
       return new Response(JSON.stringify({ error: 'db error', detail: err }), { status: 500, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
 
-    return new Response(JSON.stringify({ id, name: name.trim(), domain: (domain || '').trim() }), {
+    return new Response(JSON.stringify({ id, name: name.trim(), domain: normalizedDomain }), {
       status: 200,
       headers: { ...CORS, 'Content-Type': 'application/json' },
     });

@@ -1,5 +1,6 @@
 import { getIpInfo, lookupIpReputation, recordIpHit } from './_ip.js';
 import { verifyPow } from './_pow.js';
+import { lookupSite, originMatchesDomain } from './_sites.js';
 
 const TOKEN_TTL = 300;
 
@@ -40,6 +41,15 @@ export async function onRequestPost({ request, env }) {
       return new Response(JSON.stringify({ error: 'pow invalid' }), { status: 403, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
 
+    const site = await lookupSite(site_id);
+    if (!site || !site.domain) {
+      return new Response(JSON.stringify({ error: 'unknown or unregistered site_id' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
+    }
+    const origin = request.headers.get('origin');
+    if (!originMatchesDomain(origin, site.domain)) {
+      return new Response(JSON.stringify({ error: 'origin does not match registered domain' }), { status: 403, headers: { ...CORS, 'Content-Type': 'application/json' } });
+    }
+
     const ipInfo = await getIpInfo(request, env);
     const ipRep = await lookupIpReputation(ipInfo.ip);
     const serverPenalty = ipInfo.penalty + (ipRep.found && ipRep.score > 70 ? -0.15 : 0);
@@ -51,7 +61,7 @@ export async function onRequestPost({ request, env }) {
     await recordIpHit(ipInfo.ip, blendedScore, allFlags);
 
     const now = Math.floor(Date.now() / 1000);
-    const payload = JSON.stringify({ site_id: site_id || '', iat: now, exp: now + TOKEN_TTL, p: Math.round(adjustedP * 1000) / 1000, c: Math.round((confidence || 0) * 1000) / 1000, flags: allFlags });
+    const payload = JSON.stringify({ site_id: site_id || '', domain: site.domain, iat: now, exp: now + TOKEN_TTL, p: Math.round(adjustedP * 1000) / 1000, c: Math.round((confidence || 0) * 1000) / 1000, flags: allFlags });
     const payloadB64 = b64url(new TextEncoder().encode(payload));
     const sigB64 = b64url(await hmac(SECRET, payloadB64));
     const token = `vrf1.${payloadB64}.${sigB64}`;

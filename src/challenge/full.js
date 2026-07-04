@@ -18,7 +18,7 @@ export function runChallenge(onPass, onFail) {
   if (state._verified) { state._isBot = false; onPass && onPass(); return; }
 
   try {
-    if (sessionStorage.getItem('_st4ts_blocked') === '1') {
+    if (sessionStorage.getItem('_vf_blocked') === '1') {
       _vunlock();
       state._isBot = true;
       onFail && onFail();
@@ -28,56 +28,56 @@ export function runChallenge(onPass, onFail) {
 
   _vlock();
   var overlay = d.createElement('div');
-  overlay.id = '_st4ts_ch';
+  overlay.id = '_vf_ch';
   var mousePoints = [], lastMouse = { x: 0, y: 0 }, moveEntropy = 0, startTime = Date.now();
   var stage = 0, attempts = 0, attempts2 = 0;
 
   var CSS =
-    '#_st4ts_ch{position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px}' +
+    '#_vf_ch{position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px}' +
     '@keyframes _spin{to{transform:rotate(360deg)}}' +
     '@keyframes _shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}' +
     '@keyframes _fadein{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}' +
     '@keyframes _pop{0%{transform:scale(0)}70%{transform:scale(1.1)}100%{transform:scale(1)}}' +
-    '#_st4ts_box{background:#0c1018;border:0.5px solid #1e2738;border-radius:14px;padding:28px 24px;max-width:310px;width:100%;text-align:center;animation:_fadein .2s ease;user-select:none;-webkit-user-select:none}' +
-    '#_st4ts_shield{width:44px;height:44px;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:20px;color:#00c8ff}' +
-    '#_st4ts_title{font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px}' +
-    '#_st4ts_sub{font-size:11px;color:#3d4f63;margin:0 0 20px;line-height:1.65}' +
-    '#_st4ts_prog{height:2px;background:#111820;border-radius:1px;margin-bottom:22px;overflow:hidden}' +
-    '#_st4ts_bar{height:100%;background:#00c8ff;border-radius:1px;width:30%;transition:width .5s ease,background .3s}' +
-    '#_st4ts_btn{width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(0,200,255,.5);background:rgba(0,200,255,.05);display:flex;align-items:center;justify-content:center;cursor:pointer;margin:0 auto;transition:background .15s,transform .12s;font-size:20px;color:#00c8ff}' +
-    '#_st4ts_btn:hover{background:rgba(0,200,255,.1);transform:scale(1.05)}' +
-    '#_st4ts_btn:active{transform:scale(.96)}' +
-    '.st4_ring{width:20px;height:20px;border:2px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_spin .7s linear infinite}' +
-    '#_st4ts_status{font-size:11px;color:#3d4f63;margin-top:10px;min-height:16px}' +
-    '#_st4ts_attr{font-size:10px;color:#1e2738;margin-top:18px}' +
-    '#_st4ts_attr a{color:#2d3748;text-decoration:underline;text-underline-offset:2px}' +
-    '#_st4ts_targets{position:relative;min-height:90px;background:#080d12;border-radius:8px;border:0.5px solid #111820;margin-bottom:10px;display:none;overflow:visible}' +
-    '.st4_target{position:absolute;width:32px;height:32px;border-radius:50%;border:1.5px solid #f59e0b;background:rgba(245,158,11,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#f59e0b;transition:background .1s;animation:_pop .25s ease;touch-action:manipulation}' +
-    '.st4_target:hover{background:rgba(245,158,11,.18)}';
+    '#_vf_box{background:#0c1018;border:0.5px solid #1e2738;border-radius:14px;padding:28px 24px;max-width:310px;width:100%;text-align:center;animation:_fadein .2s ease;user-select:none;-webkit-user-select:none}' +
+    '#_vf_shield{width:44px;height:44px;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:20px;color:#00c8ff}' +
+    '#_vf_title{font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px}' +
+    '#_vf_sub{font-size:11px;color:#3d4f63;margin:0 0 20px;line-height:1.65}' +
+    '#_vf_prog{height:2px;background:#111820;border-radius:1px;margin-bottom:22px;overflow:hidden}' +
+    '#_vf_bar{height:100%;background:#00c8ff;border-radius:1px;width:30%;transition:width .5s ease,background .3s}' +
+    '#_vf_btn{width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(0,200,255,.5);background:rgba(0,200,255,.05);display:flex;align-items:center;justify-content:center;cursor:pointer;margin:0 auto;transition:background .15s,transform .12s;font-size:20px;color:#00c8ff}' +
+    '#_vf_btn:hover{background:rgba(0,200,255,.1);transform:scale(1.05)}' +
+    '#_vf_btn:active{transform:scale(.96)}' +
+    '.vf_ring{width:20px;height:20px;border:2px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_spin .7s linear infinite}' +
+    '#_vf_status{font-size:11px;color:#3d4f63;margin-top:10px;min-height:16px}' +
+    '#_vf_attr{font-size:10px;color:#1e2738;margin-top:18px}' +
+    '#_vf_attr a{color:#2d3748;text-decoration:underline;text-underline-offset:2px}' +
+    '#_vf_targets{position:relative;min-height:90px;background:#080d12;border-radius:8px;border:0.5px solid #111820;margin-bottom:10px;display:none;overflow:visible}' +
+    '.vf_target{position:absolute;width:32px;height:32px;border-radius:50%;border:1.5px solid #f59e0b;background:rgba(245,158,11,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#f59e0b;transition:background .1s;animation:_pop .25s ease;touch-action:manipulation}' +
+    '.vf_target:hover{background:rgba(245,158,11,.18)}';
 
   var styleEl = d.createElement('style'); styleEl.textContent = CSS; d.head.appendChild(styleEl);
 
   overlay.innerHTML =
-    '<div id="_st4ts_box">' +
-      '<div id="_st4ts_shield" style="color:#00c8ff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>' +
-      '<p id="_st4ts_title">one quick check</p>' +
-      '<p id="_st4ts_sub">click the circle to continue</p>' +
-      '<div id="_st4ts_prog"><div id="_st4ts_bar"></div></div>' +
-      '<div id="_st4ts_targets"><svg id="_st4ts_trail" style="position:absolute;inset:0;width:100%;height:100%;opacity:.18;pointer-events:none" xmlns="http://www.w3.org/2000/svg"></svg></div>' +
-      '<div id="_st4ts_btn" style="color:#00c8ff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
-      '<div id="_st4ts_status"></div>' +
-      '<p id="_st4ts_attr">powered by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p>' +
+    '<div id="_vf_box">' +
+      '<div id="_vf_shield" style="color:#00c8ff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>' +
+      '<p id="_vf_title">one quick check</p>' +
+      '<p id="_vf_sub">click the circle to continue</p>' +
+      '<div id="_vf_prog"><div id="_vf_bar"></div></div>' +
+      '<div id="_vf_targets"><svg id="_vf_trail" style="position:absolute;inset:0;width:100%;height:100%;opacity:.18;pointer-events:none" xmlns="http://www.w3.org/2000/svg"></svg></div>' +
+      '<div id="_vf_btn" style="color:#00c8ff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
+      '<div id="_vf_status"></div>' +
+      '<p id="_vf_attr">powered by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p>' +
     '</div>';
 
   d.body.appendChild(overlay); overlay.style.pointerEvents = 'auto';
 
-  var bar = d.getElementById('_st4ts_bar');
-  var btn = d.getElementById('_st4ts_btn');
-  var status = d.getElementById('_st4ts_status');
-  var title = d.getElementById('_st4ts_title');
-  var sub = d.getElementById('_st4ts_sub');
-  var targetsEl = d.getElementById('_st4ts_targets');
-  var shield = d.getElementById('_st4ts_shield');
+  var bar = d.getElementById('_vf_bar');
+  var btn = d.getElementById('_vf_btn');
+  var status = d.getElementById('_vf_status');
+  var title = d.getElementById('_vf_title');
+  var sub = d.getElementById('_vf_sub');
+  var targetsEl = d.getElementById('_vf_targets');
+  var shield = d.getElementById('_vf_shield');
   setTimeout(function () { bar.style.width = '40%'; }, 300);
 
   var mouseMoveHandler = function (e) {
@@ -96,7 +96,7 @@ export function runChallenge(onPass, onFail) {
   function setVerifying() {
     btn.style.cursor = 'default';
     btn.style.borderColor = 'rgba(0,200,255,.25)';
-    btn.innerHTML = '<div class="st4_ring"></div>';
+    btn.innerHTML = '<div class="vf_ring"></div>';
     status.textContent = 'verifying…';
     bar.style.width = '75%';
   }
@@ -115,7 +115,7 @@ export function runChallenge(onPass, onFail) {
     shield.style.color = '#10b981';
     status.style.color = '#10b981';
     status.textContent = 'verified ✓';
-    lsSet('_st4ts_v', '1');
+    lsSet('_vf_v', '1');
     state._verified = true; state._isBot = false; state._challengePassed = true; _vemit('pass', { probability: _vSc.p, confidence: _vSc.c });
 
     (function () {
@@ -279,7 +279,7 @@ export function runChallenge(onPass, onFail) {
         return;
       }
       var t = d.createElement('div');
-      t.className = 'st4_target';
+      t.className = 'vf_target';
       t.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
       var maxX = Math.max(0, targetsEl.offsetWidth - 40);
       var maxY = Math.max(0, targetsEl.offsetHeight - 40);
@@ -312,11 +312,11 @@ export function runChallenge(onPass, onFail) {
   }
 
   var _reloadCount = 0;
-  try { _reloadCount = parseInt(sessionStorage.getItem('_st4ts_rc') || '0'); } catch (e) {}
+  try { _reloadCount = parseInt(sessionStorage.getItem('_vf_rc') || '0'); } catch (e) {}
 
   function hardFail() {
     _reloadCount++;
-    try { sessionStorage.setItem('_st4ts_rc', String(_reloadCount)); } catch (e) {}
+    try { sessionStorage.setItem('_vf_rc', String(_reloadCount)); } catch (e) {}
     targetsEl.style.display = 'none';
     status.textContent = '';
     if (_reloadCount >= 2) {
@@ -663,8 +663,8 @@ export function runChallenge(onPass, onFail) {
     pWrap.appendChild(targetZone);
     pWrap.appendChild(fallbackBtn);
 
-    var box = d.getElementById('_st4ts_box');
-    box.insertBefore(pWrap, d.getElementById('_st4ts_attr'));
+    var box = d.getElementById('_vf_box');
+    box.insertBefore(pWrap, d.getElementById('_vf_attr'));
 
     function onPressMove(e) {
       if (passed) return;
@@ -736,7 +736,7 @@ export function runChallenge(onPass, onFail) {
     status.textContent = '';
 
     var wrapEl = d.createElement('div');
-    wrapEl.id = '_st4ts_word';
+    wrapEl.id = '_vf_word';
     wrapEl.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:8px;';
 
     var cvs = d.createElement('canvas');
@@ -810,8 +810,8 @@ export function runChallenge(onPass, onFail) {
 
     wrapEl.appendChild(cvs); wrapEl.appendChild(inp); wrapEl.appendChild(submitW);
 
-    var box = d.getElementById('_st4ts_box');
-    box.insertBefore(wrapEl, d.getElementById('_st4ts_attr'));
+    var box = d.getElementById('_vf_box');
+    box.insertBefore(wrapEl, d.getElementById('_vf_attr'));
 
     function checkWord() {
       var val = inp.value.trim().toLowerCase();
@@ -854,7 +854,7 @@ export function runChallenge(onPass, onFail) {
     btn.style.display = 'none';
     status.style.color = '#ef4444';
     status.textContent = 'session blocked';
-    try { sessionStorage.setItem('_st4ts_blocked', '1'); } catch (e) {}
+    try { sessionStorage.setItem('_vf_blocked', '1'); } catch (e) {}
   }
 
   btn.addEventListener('click', function () {

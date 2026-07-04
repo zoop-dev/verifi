@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>privacy — verifi</title>
+<meta name="description" content="verifi privacy policy — what is and isn't collected during bot verification.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#070a0e;--sf:#0c1018;--bd:rgba(255,255,255,.07);--bd-hover:rgba(255,255,255,.13);--text:#cdd6e0;--muted:#3d4f63;--blue:#00c8ff;--gn:#10b981}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',ui-monospace,monospace;-webkit-font-smoothing:antialiased;font-size:13px;min-height:100vh}
+body{padding:60px 24px 100px;max-width:920px;margin:0 auto}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:underline}
+a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
+.back{font-size:11px;color:var(--muted);display:inline-block;margin-bottom:32px}
+.back:hover{color:var(--text);text-decoration:none}
+
+.masthead{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--bd);padding-bottom:20px;margin-bottom:36px}
+h1{font-size:28px;font-weight:700;font-style:italic;color:var(--blue);letter-spacing:-.03em}
+.sub{font-size:11px;color:var(--muted)}
+.tag{display:inline-block;font-size:10px;padding:3px 9px;border-radius:99px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--gn)}
+
+h2{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
+p{font-size:12px;color:#4a5568;line-height:1.8;margin-bottom:10px}
+p:last-child{margin-bottom:0}
+ul{font-size:12px;color:#4a5568;line-height:1.8;padding-left:16px;margin-bottom:10px}
+ul li::marker{color:var(--muted)}
+.divider{height:1px;background:var(--bd);margin:32px 0}
+
+/* ---- spread the two comparable lists side by side ---- */
+.compare{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:36px}
+.compare .col{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:18px;transition:border-color .15s}
+.compare .col:hover{border-color:var(--bd-hover)}
+
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:36px}
+.grid2 section{min-width:0}
+
+@media (max-width:760px){
+  .compare,.grid2{grid-template-columns:1fr}
+}
+@media (max-width:480px){
+  body{padding:44px 16px 72px}
+  h1{font-size:24px}
+}
+</style>
+</head>
+<body>
+
+<a href="/" class="back">← verifi</a>
+
+<div class="masthead">
+  <h1>privacy</h1>
+  <span class="tag">no personal data collected</span>
+</div>
+<div class="sub" style="margin-top:-24px;margin-bottom:36px">last updated — May 2026</div>
+
+<section>
+  <h2>what verifi analyzes</h2>
+  <p>verifi analyzes behavioral and hardware signals to determine whether a visitor is human. none of this is personally identifiable:</p>
+  <ul>
+    <li>mouse movement patterns, velocity, and tremor (8–12hz FFT analysis)</li>
+    <li>scroll behavior, physics, and micro-corrections</li>
+    <li>keystroke timing intervals — not the keys themselves</li>
+    <li>click timing, position variance, and dwell duration</li>
+    <li>cursor path curvature and overshoot detection</li>
+    <li>requestAnimationFrame vsync jitter, GPU shader render timing</li>
+    <li>audio context floating-point precision, font render timing</li>
+    <li>touch pressure and radius variance (mobile)</li>
+    <li>browser environment signals: screen dimensions, language, pointer type</li>
+  </ul>
+  <p>verifi does not read form field values, passwords, email addresses, or any content you type.</p>
+</section>
+
+<div class="compare">
+  <div class="col">
+    <h2>what's stored</h2>
+    <ul>
+      <li>a trust score + session count, in your browser's IndexedDB/localStorage only</li>
+      <li>hashed IP (HMAC-SHA256) alongside a bot likelihood score (0–100)</li>
+      <li>anonymized NN weight deltas — the direction the model moved, not raw data</li>
+      <li>site registrations (name only)</li>
+    </ul>
+  </div>
+  <div class="col">
+    <h2>what's never collected</h2>
+    <ul>
+      <li>no raw IP addresses — hashed before storage, one-way</li>
+      <li>no cookies, no cross-site tracking</li>
+      <li>no personally identifiable information</li>
+      <li>no keystroke content, no camera/mic access, no form values</li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"></div>
+
+<div class="grid2">
+  <section>
+    <h2>IP reputation</h2>
+    <p>on page load, verifi queries a reputation API to retrieve your IP address, then hashes it with HMAC-SHA256 using a server-side secret before any storage. the hash cannot be reversed to the original IP. it's stored alongside a bot likelihood score and used to apply stricter or more lenient verification on future visits.</p>
+    <p>known malicious IP ranges from public threat intelligence feeds are pre-loaded in hashed form.</p>
+  </section>
+
+  <section>
+    <h2>federated learning</h2>
+    <p>verifi uses a small on-device neural network to improve bot detection. after a challenge, an anonymized weight delta is sent to a central server — no behavioral data, only the direction the model weights moved. deltas are averaged across all sessions globally; no individual session can be reconstructed from one.</p>
+  </section>
+
+  <section>
+    <h2>signed tokens</h2>
+    <p>after passing verification, verifi issues a short-lived signed token (HMAC-SHA256, 5 minute expiry) containing only: site ID, issue/expiry time, human probability, and confidence score. verified server-side by the site you're visiting — verifi does not log token verifications.</p>
+  </section>
+
+  <section>
+    <h2>data retention</h2>
+    <ul>
+      <li>NN weight deltas: 90 days, then deleted</li>
+      <li>IP reputation hashes: indefinite, updated on each visit</li>
+      <li>site registrations: indefinite</li>
+      <li>no session logs, no event logs, no raw IP logs</li>
+    </ul>
+  </section>
+</div>
+
+<div class="divider"></div>
+
+<section>
+  <h2>third parties</h2>
+  <p>verifi uses <a href="https://supabase.com/privacy" target="_blank">Supabase</a> to store federated model weights and hashed IP reputation data. verifi is deployed on <a href="https://www.cloudflare.com/privacypolicy/" target="_blank">Cloudflare Pages</a>. IP lookup on page load uses <a href="https://www.whatismyip.com" target="_blank">whatismyip.com</a> to retrieve the visitor's IP address for hashing.</p>
+</section>
+
+<div class="divider"></div>
+
+<section>
+  <h2>gdpr</h2>
+  <p>verifi does not process personal data as defined by GDPR. behavioral signals are not linked to any individual and cannot be used to identify a person. IP addresses are hashed before storage and cannot be reversed. no consent banner or data processing agreement is required to use verifi.</p>
+  <p>if you believe this analysis is incorrect for your jurisdiction, contact <a href="mailto:privacy@zo0p.dev">privacy@zo0p.dev</a>.</p>
+</section>
+
+<div class="divider"></div>
+
+<section>
+  <h2>contact</h2>
+  <p><a href="mailto:privacy@zo0p.dev">privacy@zo0p.dev</a></p>
+</section>
+
+</body>
+</html>

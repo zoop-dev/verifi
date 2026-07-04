@@ -16,3 +16,24 @@ export let _SITE_ID = '';
 
 export function lsGet(k) { try { return localStorage.getItem(k); } catch (e) { return null; } }
 export function lsSet(k, v) { try { localStorage.setItem(k, v); } catch (e) {} }
+
+(function migrateLegacyStorage() {
+  try {
+    if (localStorage.getItem('_vf_v') === null) {
+      var legacyV = localStorage.getItem('_st4ts_v');
+      if (legacyV !== null) { localStorage.setItem('_vf_v', legacyV); localStorage.removeItem('_st4ts_v'); }
+    }
+  } catch (e) {}
+  try {
+    if (sessionStorage.getItem('_vf_blocked') === null) {
+      var legacyBlocked = sessionStorage.getItem('_st4ts_blocked');
+      if (legacyBlocked !== null) { sessionStorage.setItem('_vf_blocked', legacyBlocked); sessionStorage.removeItem('_st4ts_blocked'); }
+    }
+  } catch (e) {}
+  try {
+    if (sessionStorage.getItem('_vf_rc') === null) {
+      var legacyRc = sessionStorage.getItem('_st4ts_rc');
+      if (legacyRc !== null) { sessionStorage.setItem('_vf_rc', legacyRc); sessionStorage.removeItem('_st4ts_rc'); }
+    }
+  } catch (e) {}
+})();

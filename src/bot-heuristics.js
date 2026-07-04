@@ -5,7 +5,7 @@ import { _vSc } from './telemetry.js';
 
 state._botScore = 0;
 state._forceFailFirst = false;
-state._verified = lsGet('_st4ts_v') === '1';
+state._verified = lsGet('_vf_v') === '1';
 export var _botCheckEnabled = (function () {
   try {
     var scripts = d.querySelectorAll('script[src*="v.js"]');

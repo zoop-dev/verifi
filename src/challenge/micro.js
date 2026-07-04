@@ -12,51 +12,51 @@ export function runMicroChallenge(onPass, onFail) {
   if (!_botCheckEnabled || state._verified) { onPass && onPass(); return; }
   _vlock();
   var overlay = d.createElement('div');
-  overlay.id = '_st4ts_ch';
+  overlay.id = '_vf_ch';
   var styleEl = d.createElement('style');
   styleEl.textContent =
-    '#_st4ts_ch{position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}' +
+    '#_vf_ch{position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.55);display:flex;align-items:center;justify-content:center;padding:20px}' +
     '@keyframes _spin{to{transform:rotate(360deg)}}' +
     '@keyframes _mfade{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}' +
     '@keyframes _mexpand{from{max-height:140px}to{max-height:500px}}' +
-    '#_st4ts_micro{background:#0c1018;border:0.5px solid #1e2738;border-radius:12px;width:260px;overflow:hidden;animation:_mfade .2s ease;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;user-select:none;-webkit-user-select:none}' +
-    '#_st4ts_micro.expanding{animation:_mexpand .3s ease;max-height:500px}' +
-    '#_st4ts_mring{width:14px;height:14px;border:1.5px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_spin .7s linear infinite;flex-shrink:0}' +
-    '#_st4ts_mbw{height:2px;background:#111820;border-radius:1px;overflow:hidden;margin:0 14px 12px}' +
-    '#_st4ts_mbar{height:100%;border-radius:1px;background:#00c8ff;width:20%;transition:width .6s ease,background .3s}' +
-    '#_st4ts_mattr{font-size:10px;color:#1e2738;padding:0 14px 10px;text-align:center}' +
-    '#_st4ts_mattr a{color:#2d3748;text-decoration:underline;text-underline-offset:2px}' +
-    '#_st4ts_mhead{padding:14px 14px 10px;display:flex;align-items:center;gap:10px}' +
-    '#_st4ts_micon{flex-shrink:0}' +
-    '#_st4ts_mtitle{font-size:12px;font-weight:500;color:#cdd6e0;margin-bottom:2px}' +
-    '#_st4ts_msub{font-size:10px;color:#3d4f63}' +
-    '#_st4ts_mexpanded{display:none;padding:0 14px 14px;text-align:center}' +
-    '#_st4ts_mbtn{width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(0,200,255,.5);background:rgba(0,200,255,.05);display:flex;align-items:center;justify-content:center;margin:12px auto 0;cursor:pointer;color:#00c8ff;font-size:18px}' +
-    '#_st4ts_mshield{width:40px;height:40px;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;color:#00c8ff}' +
-    '#_st4ts_mstatus{font-size:11px;color:#3d4f63;margin-top:8px;min-height:14px}';
+    '#_vf_micro{background:#0c1018;border:0.5px solid #1e2738;border-radius:12px;width:260px;overflow:hidden;animation:_mfade .2s ease;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;user-select:none;-webkit-user-select:none}' +
+    '#_vf_micro.expanding{animation:_mexpand .3s ease;max-height:500px}' +
+    '#_vf_mring{width:14px;height:14px;border:1.5px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_spin .7s linear infinite;flex-shrink:0}' +
+    '#_vf_mbw{height:2px;background:#111820;border-radius:1px;overflow:hidden;margin:0 14px 12px}' +
+    '#_vf_mbar{height:100%;border-radius:1px;background:#00c8ff;width:20%;transition:width .6s ease,background .3s}' +
+    '#_vf_mattr{font-size:10px;color:#1e2738;padding:0 14px 10px;text-align:center}' +
+    '#_vf_mattr a{color:#2d3748;text-decoration:underline;text-underline-offset:2px}' +
+    '#_vf_mhead{padding:14px 14px 10px;display:flex;align-items:center;gap:10px}' +
+    '#_vf_micon{flex-shrink:0}' +
+    '#_vf_mtitle{font-size:12px;font-weight:500;color:#cdd6e0;margin-bottom:2px}' +
+    '#_vf_msub{font-size:10px;color:#3d4f63}' +
+    '#_vf_mexpanded{display:none;padding:0 14px 14px;text-align:center}' +
+    '#_vf_mbtn{width:48px;height:48px;border-radius:50%;border:1.5px solid rgba(0,200,255,.5);background:rgba(0,200,255,.05);display:flex;align-items:center;justify-content:center;margin:12px auto 0;cursor:pointer;color:#00c8ff;font-size:18px}' +
+    '#_vf_mshield{width:40px;height:40px;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;color:#00c8ff}' +
+    '#_vf_mstatus{font-size:11px;color:#3d4f63;margin-top:8px;min-height:14px}';
 
   d.head.appendChild(styleEl);
 
   overlay.innerHTML =
-    '<div id="_st4ts_micro">' +
-      '<div id="_st4ts_mhead">' +
-        '<div id="_st4ts_micon"><div id="_st4ts_mring"></div></div>' +
-        '<div><div id="_st4ts_mtitle">verifying</div><div id="_st4ts_msub">checking your browser</div></div>' +
+    '<div id="_vf_micro">' +
+      '<div id="_vf_mhead">' +
+        '<div id="_vf_micon"><div id="_vf_mring"></div></div>' +
+        '<div><div id="_vf_mtitle">verifying</div><div id="_vf_msub">checking your browser</div></div>' +
       '</div>' +
-      '<div id="_st4ts_mbw"><div id="_st4ts_mbar"></div></div>' +
-      '<div id="_st4ts_mexpanded"></div>' +
-      '<div id="_st4ts_mattr">powered by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></div>' +
+      '<div id="_vf_mbw"><div id="_vf_mbar"></div></div>' +
+      '<div id="_vf_mexpanded"></div>' +
+      '<div id="_vf_mattr">powered by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></div>' +
     '</div>';
 
   d.body.appendChild(overlay); overlay.style.pointerEvents = 'auto';
 
-  var box = d.getElementById('_st4ts_micro');
-  var ring = d.getElementById('_st4ts_mring');
-  var bar = d.getElementById('_st4ts_mbar');
-  var title = d.getElementById('_st4ts_mtitle');
-  var sub = d.getElementById('_st4ts_msub');
-  var icon = d.getElementById('_st4ts_micon');
-  var expanded = d.getElementById('_st4ts_mexpanded');
+  var box = d.getElementById('_vf_micro');
+  var ring = d.getElementById('_vf_mring');
+  var bar = d.getElementById('_vf_mbar');
+  var title = d.getElementById('_vf_mtitle');
+  var sub = d.getElementById('_vf_msub');
+  var icon = d.getElementById('_vf_micon');
+  var expanded = d.getElementById('_vf_mexpanded');
   var mstatus = null;
 
 
@@ -84,7 +84,7 @@ export function runMicroChallenge(onPass, onFail) {
       title.style.color = '#10b981';
       title.textContent = 'verified';
       sub.textContent = 'all good';
-      lsSet('_st4ts_v', '1');
+      lsSet('_vf_v', '1');
       state._verified = true; state._isBot = false; state._challengePassed = true; _vemit('pass', { probability: _vSc.p, confidence: _vSc.c });
       setTimeout(function () {
         overlay.style.transition = 'opacity .3s'; overlay.style.opacity = '0';
@@ -95,7 +95,7 @@ export function runMicroChallenge(onPass, onFail) {
       bar.style.width = '15%';
       bar.style.background = '#ef4444';
       ring.style.display = 'none';
-      icon.innerHTML = '<div id="_st4ts_mshield"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>';
+      icon.innerHTML = '<div id="_vf_mshield"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>';
       title.textContent = 'one quick check';
       title.style.color = '#cdd6e0';
       sub.textContent = 'click the circle to continue';
@@ -112,17 +112,17 @@ export function runMicroChallenge(onPass, onFail) {
 
       expanded.style.display = 'block';
       expanded.innerHTML =
-        '<div id="_st4ts_mbtn" onclick="_mHandleClick()">' +
+        '<div id="_vf_mbtn" onclick="_mHandleClick()">' +
           '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
         '</div>' +
-        '<div id="_st4ts_mstatus" style="font-size:11px;color:#3d4f63;margin-top:10px;min-height:14px"></div>';
-      mstatus = d.getElementById('_st4ts_mstatus');
+        '<div id="_vf_mstatus" style="font-size:11px;color:#3d4f63;margin-top:10px;min-height:14px"></div>';
+      mstatus = d.getElementById('_vf_mstatus');
 
       setTimeout(function () { bar.style.width = '35%'; }, 200);
 
       w._mHandleClick = function () {
         bar.style.width = '80%';
-        var mbtn = d.getElementById('_st4ts_mbtn');
+        var mbtn = d.getElementById('_vf_mbtn');
         if (mbtn) mbtn.innerHTML = '<div style="width:14px;height:14px;border:1.5px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_spin .7s linear infinite"></div>';
         if (mstatus) mstatus.textContent = 'verifying…';
         setTimeout(function () {
@@ -138,7 +138,7 @@ export function runMicroChallenge(onPass, onFail) {
             sub.textContent = 'you are in';
             if (mbtn) { mbtn.style.borderColor = 'rgba(16,185,129,.4)'; mbtn.style.background = 'rgba(16,185,129,.06)'; mbtn.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>'; }
             if (mstatus) { mstatus.textContent = 'verified ✓'; mstatus.style.color = '#10b981'; }
-            lsSet('_st4ts_v', '1'); state._verified = true; state._isBot = false; state._challengePassed = true; _vemit('pass', { probability: _vSc.p, confidence: _vSc.c });
+            lsSet('_vf_v', '1'); state._verified = true; state._isBot = false; state._challengePassed = true; _vemit('pass', { probability: _vSc.p, confidence: _vSc.c });
             setTimeout(function () { overlay.style.transition = 'opacity .3s'; overlay.style.opacity = '0'; setTimeout(function () { _vunlock(); if (overlay.parentNode) overlay.parentNode.removeChild(overlay); styleEl.remove(); onPass && onPass(); }, 300); }, 900);
           } else {
 
