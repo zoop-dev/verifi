@@ -1,6 +1,6 @@
 var CHANGES = [
   {
-    version: '1.0.0',
+    version: '1.1.0',
     date: '2026-07-04',
     items: [
       { tag: 'sec', text: 'tokens are locked to whatever domain you registered with now, so nobody can grab your site id and use it on a different site' },
