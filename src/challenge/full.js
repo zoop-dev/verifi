@@ -193,11 +193,12 @@ export function runChallenge(onPass, onFail) {
   function showHardChallenge() {
     stage = 1;
     if (_hasPressure) { showPressureChallenge(); return; }
-    var types = ['targets', 'slider', 'dots', 'dial'];
+    var types = ['targets', 'slider', 'dots', 'dial', 'trace'];
     var pick = types[Math.floor(Math.random() * types.length)];
     if (pick === 'slider') showSliderChallenge();
     else if (pick === 'dots') showDotsChallenge();
     else if (pick === 'dial') showDialChallenge();
+    else if (pick === 'trace') showTraceChallenge();
     else showTargetsChallenge();
   }
 
@@ -713,6 +714,114 @@ export function runChallenge(onPass, onFail) {
     status.style.color = 'rgba(205,214,224,.4)';
   }
 
+  function showTraceChallenge() {
+    title.textContent = 'almost there';
+    sub.textContent = 'drag the dot along the line to the end';
+    shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12c3-6 6 6 9 0s6-6 9 0"/></svg>';
+    shield.style.borderColor = 'rgba(16,185,129,.2)';
+    shield.style.background = 'rgba(16,185,129,.06)';
+    shield.style.color = '#10b981';
+    btn.style.display = 'none';
+    status.textContent = '';
+
+    var W = 260, H = 100, PAD = 22;
+    var svgNS = 'http://www.w3.org/2000/svg';
+    var svg = d.createElementNS(svgNS, 'svg');
+    svg.setAttribute('width', W); svg.setAttribute('height', H);
+    svg.style.cssText = 'display:block;margin:0 auto;touch-action:none;user-select:none';
+
+    var N = 48, pts = [];
+    var amp = 16 + Math.random() * 12, freq = 1.3 + Math.random() * 0.8;
+    for (var i = 0; i < N; i++) {
+      var t = i / (N - 1);
+      pts.push({ x: PAD + t * (W - PAD * 2), y: H / 2 + Math.sin(t * Math.PI * freq) * amp });
+    }
+    var pathD = pts.map(function (p, i) { return (i === 0 ? 'M' : 'L') + p.x.toFixed(1) + ',' + p.y.toFixed(1); }).join(' ');
+
+    var lane = d.createElementNS(svgNS, 'path');
+    lane.setAttribute('d', pathD);
+    lane.setAttribute('fill', 'none'); lane.setAttribute('stroke', 'rgba(16,185,129,.15)'); lane.setAttribute('stroke-width', '22'); lane.setAttribute('stroke-linecap', 'round');
+
+    var line = d.createElementNS(svgNS, 'path');
+    line.setAttribute('d', pathD);
+    line.setAttribute('fill', 'none'); line.setAttribute('stroke', 'rgba(16,185,129,.4)'); line.setAttribute('stroke-width', '1.5'); line.setAttribute('stroke-dasharray', '3 4');
+
+    var endDot = d.createElementNS(svgNS, 'circle');
+    endDot.setAttribute('cx', pts[N - 1].x); endDot.setAttribute('cy', pts[N - 1].y); endDot.setAttribute('r', '6');
+    endDot.setAttribute('fill', 'rgba(16,185,129,.25)'); endDot.setAttribute('stroke', '#10b981');
+
+    var puck = d.createElementNS(svgNS, 'circle');
+    puck.setAttribute('cx', pts[0].x); puck.setAttribute('cy', pts[0].y); puck.setAttribute('r', '9');
+    puck.setAttribute('fill', '#0c1018'); puck.setAttribute('stroke', '#10b981'); puck.setAttribute('stroke-width', '2');
+    puck.style.cursor = 'grab';
+
+    svg.appendChild(lane); svg.appendChild(line); svg.appendChild(endDot); svg.appendChild(puck);
+    targetsEl.style.display = 'block'; targetsEl.innerHTML = ''; targetsEl.appendChild(svg);
+
+    var dragging = false, progress = 0, samples = 0;
+    var LANE_TOL = 17, END_TOL = 14;
+
+    function nearestOnPath(x, y) {
+      var best = Infinity, bi = 0;
+      for (var i = 0; i < pts.length; i++) {
+        var dx = pts[i].x - x, dy = pts[i].y - y, dist = dx * dx + dy * dy;
+        if (dist < best) { best = dist; bi = i; }
+      }
+      return { dist: Math.sqrt(best), idx: bi };
+    }
+    function getXY(e) {
+      var rect = svg.getBoundingClientRect();
+      var cx = e.touches ? e.touches[0].clientX : e.clientX;
+      var cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: cx - rect.left, y: cy - rect.top };
+    }
+    function resetPuck() {
+      dragging = false; progress = 0; samples = 0;
+      puck.setAttribute('cx', pts[0].x); puck.setAttribute('cy', pts[0].y);
+    }
+    function onStart(e) {
+      var p = getXY(e);
+      var n = nearestOnPath(p.x, p.y);
+      if (n.dist < 20 && n.idx < 6) { dragging = true; puck.style.cursor = 'grabbing'; }
+      e.preventDefault();
+    }
+    function onMove(e) {
+      if (!dragging) return;
+      var p = getXY(e);
+      var n = nearestOnPath(p.x, p.y);
+      samples++;
+      if (n.dist > LANE_TOL) {
+        resetPuck();
+        attempts2++;
+        if (attempts2 >= 3) { targetsEl.style.display = 'none'; if (_reloadCount >= 2) permanentBlock(); else showWordChallenge(); return; }
+        status.textContent = 'off the line — try again';
+        status.style.color = '#f59e0b';
+        setTimeout(function () { status.textContent = ''; }, 900);
+        return;
+      }
+      progress = Math.max(progress, n.idx);
+      puck.setAttribute('cx', p.x); puck.setAttribute('cy', p.y);
+      bar.style.width = (20 + (progress / (pts.length - 1)) * 70) + '%';
+      var endDist = Math.hypot(p.x - pts[pts.length - 1].x, p.y - pts[pts.length - 1].y);
+      if (progress >= pts.length - 4 && endDist < END_TOL && samples > 15) {
+        dragging = false;
+        d.removeEventListener('mousemove', onMove);
+        d.removeEventListener('touchmove', onMove);
+        setVerifying();
+        setTimeout(setSuccess, 1200);
+      }
+      e.preventDefault();
+    }
+    function onEnd() { dragging = false; puck.style.cursor = 'grab'; }
+
+    puck.addEventListener('mousedown', onStart);
+    puck.addEventListener('touchstart', onStart, { passive: false });
+    d.addEventListener('mousemove', onMove);
+    d.addEventListener('touchmove', onMove, { passive: false });
+    d.addEventListener('mouseup', onEnd);
+    d.addEventListener('touchend', onEnd);
+  }
+
   function showWordChallenge() {
     var WORDS = [
       'river', 'cloud', 'seven', 'plant', 'frame', 'table', 'stone', 'light', 'brush', 'dream',
@@ -813,6 +922,7 @@ export function runChallenge(onPass, onFail) {
     var box = d.getElementById('_vf_box');
     box.insertBefore(wrapEl, d.getElementById('_vf_attr'));
 
+    var wordFails = 0;
     function checkWord() {
       var val = inp.value.trim().toLowerCase();
       if (val === word) {
@@ -820,9 +930,15 @@ export function runChallenge(onPass, onFail) {
         setVerifying();
         setTimeout(setSuccess, 1200);
       } else {
+        wordFails++;
+        if (wordFails >= 3) {
+          wrapEl.remove();
+          permanentBlock();
+          return;
+        }
         inp.style.borderColor = 'rgba(239,68,68,.5)';
         inp.style.color = '#ef4444';
-        status.textContent = 'incorrect — try again';
+        status.textContent = 'incorrect — ' + (3 - wordFails) + ' attempt' + (3 - wordFails === 1 ? '' : 's') + ' left';
         status.style.color = '#ef4444';
         setTimeout(function () {
           inp.style.borderColor = 'rgba(0,200,255,.2)';
@@ -837,8 +953,7 @@ export function runChallenge(onPass, onFail) {
     inp.addEventListener('keydown', function (e) { if (e.key === 'Enter') checkWord(); });
     inp.focus();
 
-    var left = 3 - _reloadCount;
-    status.textContent = left + ' attempt' + (left === 1 ? '' : 's') + ' remaining';
+    status.textContent = '3 attempts remaining';
     status.style.color = 'rgba(205,214,224,.4)';
   }
 
