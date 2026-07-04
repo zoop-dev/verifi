@@ -470,7 +470,7 @@ export function runChallenge(onPass, onFail) {
           }
         }
       } else {
-        missClicks++; missCount++;
+        missCount++;
         if (missCount > 8) { attempts2++; if (attempts2 >= 3) { escalate(); } else { current = 0; clickTimes = []; missCount = 0; renderDots(); } }
       }
     });

@@ -1,5 +1,12 @@
 var CHANGES = [
   {
+    version: '1.1.1',
+    date: '2026-07-04',
+    items: [
+      { tag: 'fix', text: 'the dots challenge crashed with "missClicks is not defined" on a miss-click after we removed the old targets challenge — leftover dead code, cleaned up' }
+    ]
+  },
+  {
     version: '1.1.0',
     date: '2026-07-04',
     items: [
