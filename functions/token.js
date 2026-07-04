@@ -2,6 +2,7 @@ import { getIpInfo, lookupIpReputation, recordIpHit } from './_ip.js';
 import { verifyPow } from './_pow.js';
 import { lookupSite, originMatchesDomain } from './_sites.js';
 import { rateLimit } from './_ratelimit.js';
+import { bumpPass } from './_stats.js';
 
 const TOKEN_TTL = 300;
 
@@ -71,6 +72,8 @@ export async function onRequestPost({ request, env }) {
     const payloadB64 = b64url(new TextEncoder().encode(payload));
     const sigB64 = b64url(await hmac(SECRET, payloadB64));
     const token = `vrf1.${payloadB64}.${sigB64}`;
+
+    await bumpPass(site_id);
 
     return new Response(JSON.stringify({ token, expires_in: TOKEN_TTL, server_penalty: serverPenalty, flags: allFlags }), {
       status: 200, headers: { ...CORS, 'Content-Type': 'application/json' },

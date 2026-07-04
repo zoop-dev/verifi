@@ -1,4 +1,5 @@
 import { hashIp, DC_ASNS, lookupIpReputation, recordIpHit } from './_ip.js';
+import { bumpFail } from './_stats.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -68,6 +69,10 @@ export async function onRequestPost({ request, env, context }) {
     if (ip) {
       upsertStatus = await recordIpHit(ip, botScore, allFlags);
       debug.push(`upsert=${upsertStatus}`);
+    }
+
+    if (body.fail && body.site_id) {
+      await bumpFail(body.site_id);
     }
 
     return new Response(JSON.stringify({

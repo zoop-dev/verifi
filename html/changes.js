@@ -1,5 +1,13 @@
 var CHANGES = [
   {
+    version: '1.3.0',
+    date: '2026-07-04',
+    items: [
+      { tag: 'new', text: 'added basic per-site pass/fail counts, admin-only for now' },
+      { tag: 'fix', text: 'fixed a database lockdown that had accidentally broken ip reputation tracking entirely' }
+    ]
+  },
+  {
     version: '1.2.0',
     date: '2026-07-04',
     items: [
