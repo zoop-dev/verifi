@@ -5,6 +5,7 @@ import { _vupdSc, _vanalyze } from './telemetry.js';
 import { _vfetchWeights, _vpushWeights } from './weights-sync.js';
 import { _vraf, _vhw } from './hardware.js';
 import { _makePowChallenge, _solvePow } from './pow.js';
+import { VERIFI_VERSION } from './version.js';
 
 import './behavior.js';
 import './bot-heuristics.js';
@@ -39,4 +40,4 @@ _vload().then(function () {
   }
 });
 
-console.log('%c verifi %c v1.0.0 — verifi.zo0p.dev', 'background:#00c8ff;color:#070a0e;font-weight:700;font-style:italic;padding:2px 6px;border-radius:3px', 'color:inherit');
+console.log('%c verifi %c v' + VERIFI_VERSION + ' — verifi.zo0p.dev', 'background:#00c8ff;color:#070a0e;font-weight:700;font-style:italic;padding:2px 6px;border-radius:3px', 'color:inherit');

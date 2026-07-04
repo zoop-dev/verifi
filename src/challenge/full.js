@@ -3,15 +3,14 @@ import { state } from '../state.js';
 import { lsSet } from '../site-config.js';
 import { _POW_URL, _SITE_ID } from '../site-config.js';
 import { _vlock, _vunlock } from '../about.js';
-import { _vSeq, _vTB, _vSc } from '../telemetry.js';
+import { _vSeq, _vSc } from '../telemetry.js';
 import { _vlearn } from '../nn.js';
 import { _vpushWeights } from '../weights-sync.js';
 import { _vemit } from '../events.js';
 import { _behScore, _beh } from '../behavior.js';
 import { _vfetchToken } from '../network.js';
 import { _botCheckEnabled } from '../bot-heuristics.js';
-import { _vP } from '../storage.js';
-import { _vupdScore } from '../telemetry.js';
+import challengeCss from '../styles/challenge-full.css?raw';
 
 export function runChallenge(onPass, onFail) {
   if (!_botCheckEnabled) { state._isBot = false; onPass && onPass(); return; }
@@ -32,30 +31,7 @@ export function runChallenge(onPass, onFail) {
   var mousePoints = [], lastMouse = { x: 0, y: 0 }, moveEntropy = 0, startTime = Date.now();
   var stage = 0, attempts = 0, attempts2 = 0;
 
-  var CSS =
-    '#_vf_ch{position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.72);display:flex;align-items:center;justify-content:center;padding:20px}' +
-    '@keyframes _spin{to{transform:rotate(360deg)}}' +
-    '@keyframes _shake{0%,100%{transform:translateX(0)}20%,60%{transform:translateX(-6px)}40%,80%{transform:translateX(6px)}}' +
-    '@keyframes _fadein{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:scale(1)}}' +
-    '@keyframes _pop{0%{transform:scale(0)}70%{transform:scale(1.1)}100%{transform:scale(1)}}' +
-    '#_vf_box{background:#0c1018;border:0.5px solid #1e2738;border-radius:14px;padding:28px 24px;max-width:310px;width:100%;text-align:center;animation:_fadein .2s ease;user-select:none;-webkit-user-select:none}' +
-    '#_vf_shield{width:44px;height:44px;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;font-size:20px;color:#00c8ff}' +
-    '#_vf_title{font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px}' +
-    '#_vf_sub{font-size:11px;color:#3d4f63;margin:0 0 20px;line-height:1.65}' +
-    '#_vf_prog{height:2px;background:#111820;border-radius:1px;margin-bottom:22px;overflow:hidden}' +
-    '#_vf_bar{height:100%;background:#00c8ff;border-radius:1px;width:30%;transition:width .5s ease,background .3s}' +
-    '#_vf_btn{width:54px;height:54px;border-radius:50%;border:1.5px solid rgba(0,200,255,.5);background:rgba(0,200,255,.05);display:flex;align-items:center;justify-content:center;cursor:pointer;margin:0 auto;transition:background .15s,transform .12s;font-size:20px;color:#00c8ff}' +
-    '#_vf_btn:hover{background:rgba(0,200,255,.1);transform:scale(1.05)}' +
-    '#_vf_btn:active{transform:scale(.96)}' +
-    '.vf_ring{width:20px;height:20px;border:2px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_spin .7s linear infinite}' +
-    '#_vf_status{font-size:11px;color:#3d4f63;margin-top:10px;min-height:16px}' +
-    '#_vf_attr{font-size:10px;color:#1e2738;margin-top:18px}' +
-    '#_vf_attr a{color:#2d3748;text-decoration:underline;text-underline-offset:2px}' +
-    '#_vf_targets{position:relative;min-height:90px;background:#080d12;border-radius:8px;border:0.5px solid #111820;margin-bottom:10px;display:none;overflow:visible}' +
-    '.vf_target{position:absolute;width:32px;height:32px;border-radius:50%;border:1.5px solid #f59e0b;background:rgba(245,158,11,.08);display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:13px;color:#f59e0b;transition:background .1s;animation:_pop .25s ease;touch-action:manipulation}' +
-    '.vf_target:hover{background:rgba(245,158,11,.18)}';
-
-  var styleEl = d.createElement('style'); styleEl.textContent = CSS; d.head.appendChild(styleEl);
+  var styleEl = d.createElement('style'); styleEl.textContent = challengeCss; d.head.appendChild(styleEl);
 
   overlay.innerHTML =
     '<div id="_vf_box">' +
@@ -172,159 +148,155 @@ export function runChallenge(onPass, onFail) {
     }, 800);
   }
 
-  var _hasPressure = (function () {
-    try {
-      if (!('ontouchstart' in w)) return false;
-
-      var _fpTest = false;
-      var _fpHandler = function (e) {
-        var t = e.touches[0];
-        if (t && t.force > 0 && t.force < 1) _fpTest = true;
-      };
-      d.addEventListener('touchstart', _fpHandler, { once: true, passive: true });
-      setTimeout(function () { d.removeEventListener('touchstart', _fpHandler); }, 3000);
-
-      return true;
-    } catch (e) { return false }
-  })();
-  var _forceSupported = false;
-
-
   function showHardChallenge() {
     stage = 1;
-    if (_hasPressure) { showPressureChallenge(); return; }
-    var types = ['targets', 'slider', 'dots', 'dial', 'trace'];
+    var types = ['draw', 'slider', 'dots', 'dial', 'trace'];
     var pick = types[Math.floor(Math.random() * types.length)];
     if (pick === 'slider') showSliderChallenge();
     else if (pick === 'dots') showDotsChallenge();
     else if (pick === 'dial') showDialChallenge();
     else if (pick === 'trace') showTraceChallenge();
-    else showTargetsChallenge();
+    else showDrawChallenge();
   }
 
 
-  function showTargetsChallenge() {
+  function showDrawChallenge() {
     title.textContent = 'almost there';
-    sub.textContent = 'click each target before it disappears';
-    shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
-    shield.style.borderColor = 'rgba(245,158,11,.2)';
-    shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/></svg>';
+    var shape = Math.random() < 0.5 ? 'circle' : 'check';
+    sub.textContent = shape === 'circle' ? 'draw a circle over the dotted line' : 'draw a checkmark over the dotted line';
+    shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12l5 5L20 6"/></svg>';
     shield.style.borderColor = 'rgba(245,158,11,.2)';
     shield.style.background = 'rgba(245,158,11,.06)';
     shield.style.color = '#f59e0b';
     bar.style.background = '#f59e0b';
     btn.style.display = 'none';
     status.textContent = '';
-    targetsEl.style.display = 'block';
-    var needed = 4, clicked2 = 0;
-    var missClicks = 0, missPositions = [], lastTargetPos = { x: -1, y: -1 }, hitVelocities = [];
-    var missHandler = function (e) {
-      var tx = e.clientX, ty = e.clientY;
 
-      if (e.target === targetsEl || e.target.tagName === 'svg' || e.target.tagName === 'polyline') {
-        missClicks++;
-        var rect = targetsEl.getBoundingClientRect();
-        missPositions.push({ x: tx - rect.left, y: ty - rect.top, t: Date.now() });
+    var W = 240, H = 140;
+    targetsEl.style.display = 'block'; targetsEl.innerHTML = ''; targetsEl.style.padding = '10px';
+
+    var cvs = d.createElement('canvas');
+    cvs.width = W; cvs.height = H;
+    cvs.style.cssText = 'display:block;margin:0 auto;border-radius:6px;background:#080d12;touch-action:none;cursor:crosshair';
+    var ctx = cvs.getContext('2d');
+
+    function drawGuide() {
+      ctx.clearRect(0, 0, W, H);
+      ctx.strokeStyle = 'rgba(245,158,11,.25)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([4, 4]);
+      ctx.beginPath();
+      if (shape === 'circle') {
+        ctx.arc(W / 2, H / 2, 45, 0, Math.PI * 2);
+      } else {
+        ctx.moveTo(W / 2 - 40, H / 2 - 5);
+        ctx.lineTo(W / 2 - 12, H / 2 + 25);
+        ctx.lineTo(W / 2 + 40, H / 2 - 30);
       }
-    };
-    targetsEl.addEventListener('click', missHandler);
+      ctx.stroke();
+      ctx.setLineDash([]);
+    }
+    drawGuide();
+    targetsEl.appendChild(cvs);
 
-    var cursorTrail = []; var lastCX = 0, lastCY = 0, lastCT = 0, trailAcc = 0, trailSamples = 0;
-    var trailHandler = function (e) {
-      var now = Date.now(), x = e.clientX || (_beh.lastMX), y = e.clientY || (_beh.lastMY);
-      if (lastCT) {
-        var dt = now - lastCT, dx = x - lastCX, dy = y - lastCY;
-        if (dt > 0 && dt < 500) {
-          var speed = Math.sqrt(dx * dx + dy * dy) / dt;
-          cursorTrail.push(speed);
-          if (cursorTrail.length > 2) {
-            trailAcc += Math.abs(speed - cursorTrail[cursorTrail.length - 2]);
-            trailSamples++;
-          }
-        }
-      }
-      lastCX = x; lastCY = y; lastCT = now;
-    };
-    d.addEventListener('mousemove', trailHandler);
-    d.addEventListener('touchmove', function (e) {
-      if (e.touches[0]) trailHandler({ clientX: e.touches[0].clientX, clientY: e.touches[0].clientY });
-    }, { passive: true });
+    var hint = d.createElement('div');
+    hint.style.cssText = 'text-align:center;font-size:10px;color:#3d4f63;margin-top:8px';
+    hint.textContent = 'draw over the dotted line';
+    targetsEl.appendChild(hint);
 
-    function cursorEntropy() {
-      if (!trailSamples) return 0;
-      return Math.min(100, Math.round((trailAcc / trailSamples) * 500));
+    var pts = [], drawing = false;
+
+    function getXY(e) {
+      var rect = cvs.getBoundingClientRect();
+      var cx = e.touches ? e.touches[0].clientX : e.clientX;
+      var cy = e.touches ? e.touches[0].clientY : e.clientY;
+      return { x: cx - rect.left, y: cy - rect.top };
+    }
+    function validateCircle(pts) {
+      if (pts.length < 20) return false;
+      var cx = 0, cy = 0;
+      pts.forEach(function (p) { cx += p.x; cy += p.y; });
+      cx /= pts.length; cy /= pts.length;
+      var radii = pts.map(function (p) { return Math.hypot(p.x - cx, p.y - cy); });
+      var avgR = radii.reduce(function (a, b) { return a + b; }, 0) / radii.length;
+      if (avgR < 15) return false;
+      var variance = radii.reduce(function (a, r) { return a + Math.pow(r - avgR, 2); }, 0) / radii.length;
+      var relStd = Math.sqrt(variance) / avgR;
+      var bins = new Array(16).fill(false);
+      pts.forEach(function (p) {
+        var ang = Math.atan2(p.y - cy, p.x - cx);
+        var bi = Math.floor(((ang + Math.PI) / (Math.PI * 2)) * 16) % 16;
+        bins[bi] = true;
+      });
+      var covered = bins.filter(Boolean).length;
+      var closed = Math.hypot(pts[0].x - pts[pts.length - 1].x, pts[0].y - pts[pts.length - 1].y) < avgR * 0.7;
+      return relStd < 0.45 && covered >= 12 && closed;
+    }
+    function validateCheck(pts) {
+      if (pts.length < 8) return false;
+      var maxYIdx = 0;
+      for (var i = 1; i < pts.length; i++) if (pts[i].y > pts[maxYIdx].y) maxYIdx = i;
+      if (maxYIdx < 2 || maxYIdx > pts.length - 3) return false;
+      var down = pts.slice(0, maxYIdx + 1);
+      var up = pts.slice(maxYIdx);
+      var downDx = down[down.length - 1].x - down[0].x, downDy = down[down.length - 1].y - down[0].y;
+      var upDx = up[up.length - 1].x - up[0].x, upDy = up[up.length - 1].y - up[0].y;
+      var downOk = downDx > 5 && downDy > 5;
+      var upOk = upDx > 5 && upDy < -5;
+      var upSteeper = Math.abs(upDy / (Math.abs(upDx) + 1)) > Math.abs(downDy / (Math.abs(downDx) + 1)) * 0.8;
+      return downOk && upOk && upSteeper;
     }
 
-    function spawnTarget() {
-      if (clicked2 >= needed) {
-        d.removeEventListener('mousemove', trailHandler);
-        targetsEl.removeEventListener('click', missHandler);
-        var entropy = cursorEntropy();
-
-        var missBonus = Math.min(30, missClicks * 10);
-
-        var velVariance = 0;
-        if (hitVelocities.length > 1) {
-          var vMean = hitVelocities.reduce(function (a, b) { return a + b; }, 0) / hitVelocities.length;
-          velVariance = hitVelocities.reduce(function (a, v) { return a + Math.abs(v - vMean); }, 0) / hitVelocities.length;
-        }
-        var velBonus = Math.min(20, Math.round(velVariance * 200));
-        var totalEntropy = Math.min(100, entropy + missBonus + velBonus);
-        status.textContent = '';
-        if (totalEntropy < 5 && trailSamples > 3) {
-          attempts2++;
-          if (attempts2 >= 2) { setTimeout(hardFail, 800); return; }
-        }
+    function onStart(e) {
+      drawing = true; pts = [];
+      pts.push(getXY(e));
+      drawGuide();
+      e.preventDefault();
+    }
+    function onMove(e) {
+      if (!drawing) return;
+      pts.push(getXY(e));
+      var n = pts.length;
+      if (n > 1) {
+        ctx.strokeStyle = '#f59e0b'; ctx.lineWidth = 2.5; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+        ctx.beginPath();
+        ctx.moveTo(pts[n - 2].x, pts[n - 2].y);
+        ctx.lineTo(pts[n - 1].x, pts[n - 1].y);
+        ctx.stroke();
+      }
+      e.preventDefault();
+    }
+    function onEnd() {
+      if (!drawing) return;
+      drawing = false;
+      var ok = shape === 'circle' ? validateCircle(pts) : validateCheck(pts);
+      if (ok) {
         setVerifying();
         setTimeout(setSuccess, 1200);
-        return;
-      }
-      var t = d.createElement('div');
-      t.className = 'vf_target';
-      t.innerHTML = '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
-      var maxX = Math.max(0, targetsEl.offsetWidth - 40);
-      var maxY = Math.max(0, targetsEl.offsetHeight - 40);
-      t.style.left = Math.max(0, Math.random() * maxX) + 'px';
-      t.style.top = Math.max(0, Math.random() * maxY) + 'px';
-      targetsEl.appendChild(t);
-      lastTargetPos = { x: parseFloat(t.style.left) + 20, y: parseFloat(t.style.top) + 20 };
-      var life = setTimeout(function () {
-        if (t.parentNode) t.parentNode.removeChild(t);
+      } else {
         attempts2++;
-        if (attempts2 >= 3) { d.removeEventListener('mousemove', trailHandler); hardFail(); }
-        else spawnTarget();
-      }, 2200);
-      function hit() {
-        clearTimeout(life);
-
-        if (cursorTrail.length > 0) hitVelocities.push(cursorTrail[cursorTrail.length - 1]);
-        t.style.background = 'rgba(16,185,129,.2)';
-        t.style.borderColor = '#10b981';
-        t.style.color = '#10b981';
-        clicked2++;
-        bar.style.width = (20 + clicked2 / needed * 70) + '%';
-        setTimeout(function () { if (t.parentNode) t.parentNode.removeChild(t); spawnTarget(); }, 180);
+        if (attempts2 >= 3) { escalate(); return; }
+        hint.textContent = 'try again'; hint.style.color = '#ef4444';
+        setTimeout(function () { drawGuide(); hint.textContent = 'draw over the dotted line'; hint.style.color = '#3d4f63'; }, 700);
       }
-      t.addEventListener('click', hit);
-      t.addEventListener('touchend', function (e) { e.preventDefault(); hit(); }, { passive: false });
     }
 
-    spawnTarget();
+    cvs.addEventListener('mousedown', onStart);
+    cvs.addEventListener('touchstart', onStart, { passive: false });
+    d.addEventListener('mousemove', onMove);
+    d.addEventListener('touchmove', onMove, { passive: false });
+    d.addEventListener('mouseup', onEnd);
+    d.addEventListener('touchend', onEnd);
   }
 
   var _reloadCount = 0;
   try { _reloadCount = parseInt(sessionStorage.getItem('_vf_rc') || '0'); } catch (e) {}
 
-  function hardFail() {
+  function escalate() {
     _reloadCount++;
     try { sessionStorage.setItem('_vf_rc', String(_reloadCount)); } catch (e) {}
     targetsEl.style.display = 'none';
-    status.textContent = '';
-    if (_reloadCount >= 2) {
-      permanentBlock();
-    } else {
-      showWordChallenge();
-    }
+    if (_reloadCount >= 2) { permanentBlock(); } else { showWordChallenge(); }
   }
 
 
@@ -407,8 +379,7 @@ export function runChallenge(onPass, onFail) {
           handle.style.borderColor = 'rgba(0,200,255,.4)';
           attempts2++;
           if (attempts2 >= 3) {
-            targetsEl.style.display = 'none';
-            if (_reloadCount >= 2) permanentBlock(); else showWordChallenge();
+            escalate();
           }
         }, 500);
       }
@@ -494,13 +465,13 @@ export function runChallenge(onPass, onFail) {
           if (mean > 120 && variance > 800) { setTimeout(function () { setSuccess(); }, 350); }
           else {
             attempts2++;
-            if (attempts2 >= 3) { targetsEl.style.display = 'none'; if (_reloadCount >= 2) permanentBlock(); else showWordChallenge(); }
+            if (attempts2 >= 3) { escalate(); }
             else { current = 0; clickTimes = []; missCount = 0; renderDots(); hint.textContent = 'try again'; hint.style.color = '#f59e0b'; setTimeout(function () { hint.textContent = 'click each number in order'; hint.style.color = '#3d4f63'; }, 1200); }
           }
         }
       } else {
         missClicks++; missCount++;
-        if (missCount > 8) { attempts2++; if (attempts2 >= 3) { targetsEl.style.display = 'none'; if (_reloadCount >= 2) permanentBlock(); else showWordChallenge(); } else { current = 0; clickTimes = []; missCount = 0; renderDots(); } }
+        if (missCount > 8) { attempts2++; if (attempts2 >= 3) { escalate(); } else { current = 0; clickTimes = []; missCount = 0; renderDots(); } }
       }
     });
   }
@@ -607,111 +578,12 @@ export function runChallenge(onPass, onFail) {
         setTimeout(function () {
           needle.setAttribute('stroke', '#00c8ff');
           attempts2++;
-          if (attempts2 >= 3) { targetsEl.style.display = 'none'; if (_reloadCount >= 2) permanentBlock(); else showWordChallenge(); }
+          if (attempts2 >= 3) { escalate(); }
         }, 500);
       }
     }
     d.addEventListener('mouseup', onEnd);
     d.addEventListener('touchend', onEnd);
-  }
-
-  function showPressureChallenge() {
-    shield.style.borderColor = 'rgba(0,200,255,.2)';
-    shield.style.background = 'rgba(0,200,255,.06)';
-    shield.style.color = '#00c8ff';
-    shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
-    title.textContent = 'almost there';
-    sub.textContent = 'press and hold the circle';
-    btn.style.display = 'none';
-    status.textContent = '';
-
-    var pWrap = d.createElement('div');
-    pWrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:12px;margin-bottom:8px;';
-
-    var TARGET_MIN = 0.3, TARGET_MAX = 0.7, HOLD_MS = 1200;
-    var holdStart = null, passed = false, forceHistory = [], forceDetected = false;
-
-    var pressBtn = d.createElement('div');
-    pressBtn.style.cssText = 'width:72px;height:72px;border-radius:50%;border:1.5px solid rgba(0,200,255,.4);background:rgba(0,200,255,.06);display:flex;align-items:center;justify-content:center;touch-action:none;user-select:none;cursor:pointer;position:relative;';
-    pressBtn.innerHTML = '<svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#00c8ff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="3"/></svg>';
-
-    var pressBar = d.createElement('div');
-    pressBar.style.cssText = 'width:100%;height:4px;background:#111820;border-radius:2px;overflow:hidden;';
-    var pressBarFill = d.createElement('div');
-    pressBarFill.style.cssText = 'height:100%;width:0%;background:#00c8ff;border-radius:2px;transition:width .1s,background .2s;';
-    pressBar.appendChild(pressBarFill);
-
-    var targetZone = d.createElement('div');
-    targetZone.style.cssText = 'width:100%;position:relative;height:4px;margin-top:-4px;pointer-events:none;';
-    var zoneEl = d.createElement('div');
-    zoneEl.style.cssText = 'position:absolute;left:' + Math.round(TARGET_MIN * 100) + '%;width:' + Math.round((TARGET_MAX - TARGET_MIN) * 100) + '%;height:100%;background:rgba(0,200,255,.3);border-radius:2px;';
-    targetZone.appendChild(zoneEl);
-
-
-    var fallbackBtn = d.createElement('button');
-    fallbackBtn.textContent = 'not working? tap here';
-    fallbackBtn.style.cssText = 'display:none;margin-top:4px;background:none;border:none;font-size:11px;color:rgba(0,200,255,.4);cursor:pointer;font-family:inherit;padding:4px 0;text-decoration:underline;text-underline-offset:2px;';
-    fallbackBtn.addEventListener('click', function () {
-      _vP.sig.to = { s: 20, c: 0.4 };
-      _vupdScore();
-      pWrap.remove();
-      _hasPressure = false;
-      showHardChallenge();
-    });
-
-    pWrap.appendChild(pressBtn);
-    pWrap.appendChild(pressBar);
-    pWrap.appendChild(targetZone);
-    pWrap.appendChild(fallbackBtn);
-
-    var box = d.getElementById('_vf_box');
-    box.insertBefore(pWrap, d.getElementById('_vf_attr'));
-
-    function onPressMove(e) {
-      if (passed) return;
-      var t = e.touches && e.touches[0];
-      if (!t) return;
-      var rawForce = t.force || 0;
-      var radius = (t.radiusX || 0) + (t.radiusY || 0);
-      if (rawForce > 0 && rawForce < 1) { forceDetected = true; _forceSupported = true; }
-      var f = _forceSupported ? rawForce : Math.min(1, Math.max(0, (radius - 5) / 30));
-      _vTB.push({ force: f, r: radius, t: Date.now() });
-      forceHistory.push(f);
-      var pct = Math.round(f * 100);
-      pressBarFill.style.width = pct + '%';
-      var inZone = f >= TARGET_MIN && f <= TARGET_MAX;
-      pressBarFill.style.background = inZone ? '#10b981' : '#00c8ff';
-      if (inZone) {
-        if (!holdStart) holdStart = Date.now();
-        var elapsed = Date.now() - holdStart;
-        bar.style.width = Math.round(20 + Math.min(60, elapsed / HOLD_MS * 60)) + '%';
-        if (elapsed >= HOLD_MS && !passed) {
-          passed = true;
-          var fMean = forceHistory.reduce(function (a, b) { return a + b }, 0) / forceHistory.length;
-          var fVar = forceHistory.reduce(function (a, v) { return a + Math.pow(v - fMean, 2) }, 0) / forceHistory.length;
-          if (fVar < 0.00001) { pWrap.remove(); setFail(); }
-          else { pWrap.remove(); setVerifying(); setTimeout(setSuccess, 1200); }
-        }
-      } else { holdStart = null; }
-    }
-
-    pressBtn.addEventListener('touchmove', onPressMove, { passive: true });
-    pressBtn.addEventListener('touchend', function () { if (!passed) holdStart = null; }, { passive: true });
-    pressBtn.addEventListener('touchstart', function (e) {
-      var t = e.touches[0];
-      if (t) _vTB.push({ force: t.force || 0, r: (t.radiusX || 0) + (t.radiusY || 0), t: Date.now() });
-    }, { passive: true });
-
-
-    setTimeout(function () {
-      if (!forceDetected && !passed) {
-        fallbackBtn.style.display = 'block';
-        status.textContent = 'device may not support pressure';
-        status.style.color = 'rgba(0,200,255,.3)';
-      }
-    }, 3000);
-
-    status.style.color = 'rgba(205,214,224,.4)';
   }
 
   function showTraceChallenge() {
@@ -793,7 +665,7 @@ export function runChallenge(onPass, onFail) {
       if (n.dist > LANE_TOL) {
         resetPuck();
         attempts2++;
-        if (attempts2 >= 3) { targetsEl.style.display = 'none'; if (_reloadCount >= 2) permanentBlock(); else showWordChallenge(); return; }
+        if (attempts2 >= 3) { escalate(); return; }
         status.textContent = 'off the line — try again';
         status.style.color = '#f59e0b';
         setTimeout(function () { status.textContent = ''; }, 900);
@@ -925,6 +797,10 @@ export function runChallenge(onPass, onFail) {
     var wordFails = 0;
     function checkWord() {
       var val = inp.value.trim().toLowerCase();
+      if (!val) {
+        inp.focus();
+        return;
+      }
       if (val === word) {
         wrapEl.remove();
         setVerifying();

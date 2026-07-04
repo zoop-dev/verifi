@@ -1,3 +1,7 @@
 name = "verifi"
 compatibility_date = "2024-01-01"
-pages_build_output_dir = "."
+pages_build_output_dir = "dist"
+
+[[kv_namespaces]]
+binding = "RATE_LIMIT"
+id = "a6754baf0af344dbb2116bf3e5fd39d1"

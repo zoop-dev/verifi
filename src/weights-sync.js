@@ -8,7 +8,7 @@ export var _vSynced = false;
 
 export function _vfetchWeights() {
   try {
-    fetch(_SB_URL + '/rest/v1/verifi_weights?order=created_at.desc&limit=100', {
+    fetch(_SB_URL + '/rest/v1/verifi_weights?order=created_at.desc&limit=500', {
       headers: { apikey: _SB_KEY, Authorization: 'Bearer ' + _SB_KEY }
     }).then(function (r) { return r.json(); }).then(function (rows) {
       if (!rows || !rows.length) return;

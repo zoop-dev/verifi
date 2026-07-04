@@ -1,17 +1,20 @@
-import { d } from './env.js';
+import { w, d } from './env.js';
 import { state } from './state.js';
 import { _botCheckEnabled } from './bot-heuristics.js';
 import { _makePowChallenge, _solvePow, _getDifficulty } from './pow.js';
 import { runChallenge } from './challenge/full.js';
+import gateCss from './styles/gate.css?raw';
+import permBlockCss from './styles/perm-block.css?raw';
 
 (function () {
   if (!_botCheckEnabled || state._verified) return;
   try {
     if (sessionStorage.getItem('_vf_blocked') === '1') {
+      try { w.stop(); } catch (e) {}
       function showPermBlock() {
         if (!d.body) { setTimeout(showPermBlock, 50); return; }
         var s = d.createElement('style');
-        s.textContent = '#_vfgate{position:fixed;inset:0;z-index:2147483647;background:#070a0e;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}#_vfgate_box{text-align:center;padding:0 24px;max-width:320px}';
+        s.textContent = permBlockCss;
         d.head.appendChild(s);
         var g = d.createElement('div'); g.id = '_vfgate'; g.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:#070a0e;display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
         g.innerHTML = '<div style="background:#0c1018;border:0.5px solid rgba(239,68,68,.15);border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center"><div style="width:44px;height:44px;border-radius:50%;background:rgba(239,68,68,.06);border:0.5px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#ef4444"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><p style="font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px">access blocked</p><p style="font-size:11px;color:#3d4f63;line-height:1.65;margin:0 0 18px">close this tab and reopen to try again.</p><div style="height:2px;background:#ef4444;border-radius:1px"></div><p style="font-size:10px;color:#1e2738;margin-top:18px">protected by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p></div>';
@@ -23,23 +26,9 @@ import { runChallenge } from './challenge/full.js';
   } catch (e) {}
   if (!state._isBot) return;
 
-  var GATE_CSS =
-    '#_vfgate{position:fixed;inset:0;z-index:2147483647;background:#070a0e;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:20px}' +
-    '@keyframes _vfgate_spin{to{transform:rotate(360deg)}}' +
-    '@keyframes _vfgate_fi{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}' +
-    '#_vfgate_card{background:#0c1018;border:0.5px solid #1e2738;border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center;animation:_vfgate_fi .25s ease;user-select:none;-webkit-user-select:none}' +
-    '#_vfgate_icon{width:44px;height:44px;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#00c8ff}' +
-    '#_vfgate_spinner{width:20px;height:20px;border:2px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_vfgate_spin .8s linear infinite}' +
-    '#_vfgate_title{font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px}' +
-    '#_vfgate_sub{font-size:11px;color:#3d4f63;margin:0 0 20px;line-height:1.65}' +
-    '#_vfgate_bw{height:2px;background:#111820;border-radius:1px;overflow:hidden}' +
-    '#_vfgate_bar{height:100%;background:#00c8ff;border-radius:1px;width:0%;transition:width .4s ease,background .3s}' +
-    '#_vfgate_attr{font-size:10px;color:#1e2738;margin-top:18px}' +
-    '#_vfgate_attr a{color:#2d3748;text-decoration:underline;text-underline-offset:2px}';
-
   function attachGate() {
     if (!d.head || !d.body) { setTimeout(attachGate, 30); return; }
-    var gs = d.createElement('style'); gs.textContent = GATE_CSS; d.head.appendChild(gs);
+    var gs = d.createElement('style'); gs.textContent = gateCss; d.head.appendChild(gs);
     var g = d.createElement('div'); g.id = '_vfgate';
     g.innerHTML = '<div id="_vfgate_card">' +
         '<div id="_vfgate_icon"><div id="_vfgate_spinner"></div></div>' +

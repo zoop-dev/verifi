@@ -10,9 +10,13 @@ import { _behScore } from './behavior.js';
 import { _botCheckEnabled, _getTier } from './bot-heuristics.js';
 import { runMicroChallenge } from './challenge/micro.js';
 import { runChallenge } from './challenge/full.js';
+import { VERIFI_VERSION } from './version.js';
+import gateCss from './styles/gate.css?raw';
+
+function isTruthyFlag(v) { return v === true || v === 'true'; }
 
 w.verifi = {
-  version: '1.0.0',
+  version: VERIFI_VERSION,
   on: function (ev, fn) { (_vEvts[ev] || (_vEvts[ev] = [])).push(fn); return w.verifi; },
   off: function (ev, fn) { if (_vEvts[ev]) _vEvts[ev] = _vEvts[ev].filter(function (f) { return f !== fn; }); return w.verifi; },
   config: function (opts) {
@@ -56,9 +60,9 @@ w.verifi = {
     lsSet('_vf_v', '0');
     try { sessionStorage.removeItem('_vf_blocked'); sessionStorage.removeItem('_vf_rc'); } catch (e) {}
     state._verified = false; state._isBot = false;
-    if (autoFail === true) state._forceFailFirst = true;
-    var pass = function () { console.log('%c[verifi]%c check passed', 'color:#00c8ff;font-weight:700', 'color:#48bb78'); };
-    var fail = function () { console.log('%c[verifi]%c check failed', 'color:#00c8ff;font-weight:700', 'color:#f56565'); };
+    if (isTruthyFlag(autoFail)) state._forceFailFirst = true;
+    var pass = function () { console.log('%c[verifi v' + VERIFI_VERSION + ']%c check passed', 'color:#00c8ff;font-weight:700', 'color:#48bb78'); };
+    var fail = function () { console.log('%c[verifi v' + VERIFI_VERSION + ']%c check failed', 'color:#00c8ff;font-weight:700', 'color:#f56565'); };
     var tier = _getTier();
     if (tier <= 2 && !state._forceFailFirst) { runMicroChallenge(pass, fail); }
     else { state._isBot = true; runChallenge(pass, fail); }
@@ -67,10 +71,9 @@ w.verifi = {
     lsSet('_vf_v', '0');
     try { sessionStorage.removeItem('_vf_blocked'); sessionStorage.removeItem('_vf_rc'); } catch (e) {}
     state._verified = false; state._isBot = true;
-    if (autoFail === true) state._forceFailFirst = true;
+    if (isTruthyFlag(autoFail)) state._forceFailFirst = true;
     var g = d.getElementById('_vfgate'); if (g && g.parentNode) g.parentNode.removeChild(g);
-    var GCSS = '#_vfgate{position:fixed;inset:0;z-index:2147483647;background:#070a0e;display:flex;align-items:center;justify-content:center;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;padding:20px}@keyframes _vfgate_spin{to{transform:rotate(360deg)}}@keyframes _vfgate_fi{from{opacity:0;transform:scale(.96)}to{opacity:1;transform:scale(1)}}#_vfgate_card{background:#0c1018;border:0.5px solid #1e2738;border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center;animation:_vfgate_fi .25s ease;user-select:none}#_vfgate_icon{width:44px;height:44px;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#00c8ff}#_vfgate_spinner{width:20px;height:20px;border:2px solid rgba(0,200,255,.2);border-top-color:#00c8ff;border-radius:50%;animation:_vfgate_spin .8s linear infinite}#_vfgate_title{font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px}#_vfgate_sub{font-size:11px;color:#3d4f63;margin:0 0 20px;line-height:1.65}#_vfgate_bw{height:2px;background:#111820;border-radius:1px;overflow:hidden}#_vfgate_bar{height:100%;background:#00c8ff;border-radius:1px;width:0%;transition:width .4s ease,background .3s}#_vfgate_attr{font-size:10px;color:#1e2738;margin-top:18px}#_vfgate_attr a{color:#2d3748;text-decoration:underline}';
-    var gs = d.createElement('style'); gs.textContent = GCSS; d.head.appendChild(gs);
+    var gs = d.createElement('style'); gs.textContent = gateCss; d.head.appendChild(gs);
     var g2 = d.createElement('div'); g2.id = '_vfgate';
     g2.innerHTML = '<div id="_vfgate_card"><div id="_vfgate_icon"><div id="_vfgate_spinner"></div></div><p id="_vfgate_title">checking your browser</p><p id="_vfgate_sub">this may take a moment</p><div id="_vfgate_bw"><div id="_vfgate_bar"></div></div><p id="_vfgate_attr">protected by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p></div>';
     _vlock(); d.body.appendChild(g2);
@@ -85,7 +88,7 @@ w.verifi = {
     }, 1000);
   },
   botScore: function () {
-    return { score: state._botScore, behavioural: _behScore(), verified: state._verified, isBot: state._isBot, version: '1.0.0' };
+    return { score: state._botScore, behavioural: _behScore(), verified: state._verified, isBot: state._isBot, version: VERIFI_VERSION };
   },
   profile: function () {
     _vupdSc();

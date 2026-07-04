@@ -1,6 +1,7 @@
 import { getIpInfo, lookupIpReputation, recordIpHit } from './_ip.js';
 import { verifyPow } from './_pow.js';
 import { lookupSite, originMatchesDomain } from './_sites.js';
+import { rateLimit } from './_ratelimit.js';
 
 const TOKEN_TTL = 300;
 
@@ -27,6 +28,11 @@ export async function onRequestPost({ request, env }) {
   const SECRET = env?.VERIFI_SECRET;
   if (!SECRET) throw new Error('VERIFI_SECRET not set');
   try {
+    const rl = await rateLimit(request, env, { scope: 'token', limit: 20, windowSeconds: 60 });
+    if (rl.limited) {
+      return new Response(JSON.stringify({ error: 'rate limited' }), { status: 429, headers: { ...CORS, 'Content-Type': 'application/json' } });
+    }
+
     const { site_id, pow, probability, confidence } = await request.json();
 
     if (!pow?.challenge || pow.nonce === undefined || !pow.difficulty) {

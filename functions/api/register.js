@@ -1,5 +1,6 @@
 import { SB_URL, SB_KEY } from '../_config.js';
 import { normalizeDomain } from '../_sites.js';
+import { rateLimit } from '../_ratelimit.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -17,8 +18,13 @@ export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS });
 }
 
-export async function onRequestPost({ request }) {
+export async function onRequestPost({ request, env }) {
   try {
+    const rl = await rateLimit(request, env, { scope: 'register', limit: 5, windowSeconds: 3600 });
+    if (rl.limited) {
+      return new Response(JSON.stringify({ error: 'rate limited' }), { status: 429, headers: { ...CORS, 'Content-Type': 'application/json' } });
+    }
+
     const { name, domain } = await request.json();
     if (!name || !name.trim()) {
       return new Response(JSON.stringify({ error: 'name required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
