@@ -75,7 +75,10 @@ w.verifi = {
     var g = d.getElementById('_vfgate'); if (g && g.parentNode) g.parentNode.removeChild(g);
     var gs = d.createElement('style'); gs.textContent = gateCss; d.head.appendChild(gs);
     var g2 = d.createElement('div'); g2.id = '_vfgate';
-    g2.innerHTML = '<div id="_vfgate_card"><div id="_vfgate_icon"><div id="_vfgate_spinner"></div></div><p id="_vfgate_title">checking your browser</p><p id="_vfgate_sub">this may take a moment</p><div id="_vfgate_bw"><div id="_vfgate_bar"></div></div><p id="_vfgate_attr">protected by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p></div>';
+    g2.setAttribute('role', 'dialog');
+    g2.setAttribute('aria-modal', 'true');
+    g2.setAttribute('aria-label', 'Checking your browser');
+    g2.innerHTML = '<div id="_vfgate_card"><div id="_vfgate_icon"><div id="_vfgate_spinner"></div></div><p id="_vfgate_title" aria-live="polite">checking your browser</p><p id="_vfgate_sub" aria-live="polite">this may take a moment</p><div id="_vfgate_bw"><div id="_vfgate_bar"></div></div><p id="_vfgate_attr">protected by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p></div>';
     _vlock(); d.body.appendChild(g2);
     var bar = d.getElementById('_vfgate_bar'), prog = 0;
     var pi = setInterval(function () { prog = Math.min(80, prog + (Math.random() * 6 + 2)); if (bar) bar.style.width = prog + '%'; }, 250);

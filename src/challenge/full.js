@@ -28,6 +28,9 @@ export function runChallenge(onPass, onFail) {
   _vlock();
   var overlay = d.createElement('div');
   overlay.id = '_vf_ch';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Verifying you are human');
   var mousePoints = [], lastMouse = { x: 0, y: 0 }, moveEntropy = 0, startTime = Date.now();
   var stage = 0, attempts = 0, attempts2 = 0;
 
@@ -36,13 +39,14 @@ export function runChallenge(onPass, onFail) {
   overlay.innerHTML =
     '<div id="_vf_box">' +
       '<div id="_vf_shield" style="color:#00c8ff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><polyline points="9 12 11 14 15 10"/></svg></div>' +
-      '<p id="_vf_title">one quick check</p>' +
-      '<p id="_vf_sub">click the circle to continue</p>' +
+      '<p id="_vf_title" aria-live="polite">one quick check</p>' +
+      '<p id="_vf_sub" aria-live="polite">click the circle to continue</p>' +
       '<div id="_vf_prog"><div id="_vf_bar"></div></div>' +
       '<div id="_vf_targets"><svg id="_vf_trail" style="position:absolute;inset:0;width:100%;height:100%;opacity:.18;pointer-events:none" xmlns="http://www.w3.org/2000/svg"></svg></div>' +
-      '<div id="_vf_btn" style="color:#00c8ff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></div>' +
-      '<div id="_vf_status"></div>' +
+      '<button type="button" id="_vf_btn" aria-label="Verify you are human" style="color:#00c8ff"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg></button>' +
+      '<div id="_vf_status" aria-live="polite"></div>' +
       '<p id="_vf_attr">powered by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p>' +
+      '<button type="button" id="_vf_kbfallback">trouble with mouse or touch? press and hold enter instead</button>' +
     '</div>';
 
   d.body.appendChild(overlay); overlay.style.pointerEvents = 'auto';
@@ -68,6 +72,9 @@ export function runChallenge(onPass, onFail) {
     }
   };
   d.addEventListener('mousemove', mouseMoveHandler);
+
+  var kbFallback = d.getElementById('_vf_kbfallback');
+  if (kbFallback) kbFallback.addEventListener('click', function () { showKeyholdChallenge(); });
 
   function setVerifying() {
     btn.style.cursor = 'default';
@@ -146,6 +153,58 @@ export function runChallenge(onPass, onFail) {
       btn.style.animation = '';
       showHardChallenge();
     }, 800);
+  }
+
+  function showKeyholdChallenge() {
+    title.textContent = 'almost there';
+    sub.textContent = 'press and hold enter or space for about a second and a half';
+    shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="14" x2="18" y2="14"/></svg>';
+    shield.style.borderColor = 'rgba(0,200,255,.2)';
+    shield.style.background = 'rgba(0,200,255,.06)';
+    shield.style.color = '#00c8ff';
+    btn.style.display = 'none';
+    targetsEl.style.display = 'none';
+    var kbf = d.getElementById('_vf_kbfallback');
+    if (kbf) kbf.remove();
+    status.textContent = 'waiting for key press…';
+
+    var TARGET_MIN = 900, TARGET_MAX = 2400;
+    var holding = false, holdStart = 0;
+
+    function onKeyDown(e) {
+      if (e.repeat || (e.key !== 'Enter' && e.key !== ' ')) return;
+      e.preventDefault();
+      if (holding) return;
+      holding = true;
+      holdStart = Date.now();
+      bar.style.width = '30%';
+      status.textContent = 'holding… keep holding';
+    }
+    function onKeyUp(e) {
+      if (e.key !== 'Enter' && e.key !== ' ') return;
+      if (!holding) return;
+      holding = false;
+      var dur = Date.now() - holdStart;
+      if (dur >= TARGET_MIN && dur <= TARGET_MAX) {
+        d.removeEventListener('keydown', onKeyDown);
+        d.removeEventListener('keyup', onKeyUp);
+        setVerifying();
+        setTimeout(setSuccess, 1200);
+      } else {
+        attempts2++;
+        if (attempts2 >= 3) {
+          d.removeEventListener('keydown', onKeyDown);
+          d.removeEventListener('keyup', onKeyUp);
+          escalate();
+          return;
+        }
+        bar.style.width = '15%';
+        status.textContent = dur < TARGET_MIN ? 'too short — try again' : 'too long — try again';
+        setTimeout(function () { status.textContent = 'waiting for key press…'; }, 1000);
+      }
+    }
+    d.addEventListener('keydown', onKeyDown);
+    d.addEventListener('keyup', onKeyUp);
   }
 
   function showHardChallenge() {

@@ -1,5 +1,14 @@
 var CHANGES = [
   {
+    version: '1.2.0',
+    date: '2026-07-04',
+    items: [
+      { tag: 'new', text: 'added a keyboard-only fallback ("trouble with mouse or touch?") for the harder challenges — press and hold enter/space instead of dragging or drawing' },
+      { tag: 'chg', text: 'the check buttons are real buttons now, so you can tab to them and hit enter instead of needing a mouse click' },
+      { tag: 'chg', text: 'added screen reader labels to the verification popups so they announce what is happening instead of staying silent' }
+    ]
+  },
+  {
     version: '1.1.1',
     date: '2026-07-04',
     items: [

@@ -20,7 +20,11 @@ import permBlockCss from './styles/perm-block.css?raw';
         var gs = d.createElement('style'), g = d.createElement('div');
         gs.textContent = permBlockCss;
         d.head.appendChild(gs);
-        g.id = '_vfgate'; g.innerHTML = '<div style="background:#0c1018;border:0.5px solid rgba(239,68,68,.15);border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center"><p style="font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px">access blocked</p><p style="font-size:11px;color:#3d4f63;line-height:1.65;margin:0">close this tab and reopen to try again.</p></div>';
+        g.id = '_vfgate';
+        g.setAttribute('role', 'alertdialog');
+        g.setAttribute('aria-modal', 'true');
+        g.setAttribute('aria-label', 'Access blocked');
+        g.innerHTML = '<div style="background:#0c1018;border:0.5px solid rgba(239,68,68,.15);border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center"><p style="font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px">access blocked</p><p style="font-size:11px;color:#3d4f63;line-height:1.65;margin:0">close this tab and reopen to try again.</p></div>';
         _vlock(); d.body.appendChild(g); return;
       }
     } catch (e) {}

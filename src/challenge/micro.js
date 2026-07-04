@@ -14,6 +14,9 @@ export function runMicroChallenge(onPass, onFail) {
   _vlock();
   var overlay = d.createElement('div');
   overlay.id = '_vf_ch';
+  overlay.setAttribute('role', 'dialog');
+  overlay.setAttribute('aria-modal', 'true');
+  overlay.setAttribute('aria-label', 'Verifying you are human');
   var styleEl = d.createElement('style');
   styleEl.textContent = microCss;
 
@@ -23,7 +26,7 @@ export function runMicroChallenge(onPass, onFail) {
     '<div id="_vf_micro">' +
       '<div id="_vf_mhead">' +
         '<div id="_vf_micon"><div id="_vf_mring"></div></div>' +
-        '<div><div id="_vf_mtitle">verifying</div><div id="_vf_msub">checking your browser</div></div>' +
+        '<div><div id="_vf_mtitle" aria-live="polite">verifying</div><div id="_vf_msub" aria-live="polite">checking your browser</div></div>' +
       '</div>' +
       '<div id="_vf_mbw"><div id="_vf_mbar"></div></div>' +
       '<div id="_vf_mexpanded"></div>' +
@@ -94,10 +97,10 @@ export function runMicroChallenge(onPass, onFail) {
 
       expanded.style.display = 'block';
       expanded.innerHTML =
-        '<div id="_vf_mbtn" onclick="_mHandleClick()">' +
+        '<button type="button" id="_vf_mbtn" aria-label="Verify you are human" onclick="_mHandleClick()">' +
           '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>' +
-        '</div>' +
-        '<div id="_vf_mstatus" style="font-size:11px;color:#3d4f63;margin-top:10px;min-height:14px"></div>';
+        '</button>' +
+        '<div id="_vf_mstatus" style="font-size:11px;color:#3d4f63;margin-top:10px;min-height:14px" aria-live="polite"></div>';
       mstatus = d.getElementById('_vf_mstatus');
 
       setTimeout(function () { bar.style.width = '35%'; }, 200);
