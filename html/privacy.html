@@ -9,51 +9,15 @@
 <link rel="alternate icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,700&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#070a0e;--sf:#0c1018;--bd:rgba(255,255,255,.07);--bd-hover:rgba(255,255,255,.13);--text:#cdd6e0;--muted:#3d4f63;--blue:#00c8ff;--gn:#10b981}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',ui-monospace,monospace;-webkit-font-smoothing:antialiased;font-size:13px;min-height:100vh}
-body{padding:60px 24px 100px;max-width:920px;margin:0 auto}
-a{color:var(--blue);text-decoration:none}
-a:hover{text-decoration:underline}
-a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-.back{font-size:11px;color:var(--muted);display:inline-block;margin-bottom:32px}
-.back:hover{color:var(--text);text-decoration:none}
-
-.masthead{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--bd);padding-bottom:20px;margin-bottom:36px}
-h1{font-size:28px;font-weight:700;font-style:italic;color:var(--blue);letter-spacing:-.03em}
-.sub{font-size:11px;color:var(--muted)}
-.tag{display:inline-block;font-size:10px;padding:3px 9px;border-radius:99px;background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);color:var(--gn)}
-
-h2{font-size:10px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:12px}
-p{font-size:12px;color:#4a5568;line-height:1.8;margin-bottom:10px}
-p:last-child{margin-bottom:0}
-ul{font-size:12px;color:#4a5568;line-height:1.8;padding-left:16px;margin-bottom:10px}
-ul li::marker{color:var(--muted)}
-.divider{height:1px;background:var(--bd);margin:32px 0}
-
-/* ---- spread the two comparable lists side by side ---- */
-.compare{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:36px}
-.compare .col{background:var(--sf);border:1px solid var(--bd);border-radius:6px;padding:18px;transition:border-color .15s}
-.compare .col:hover{border-color:var(--bd-hover)}
-
-.grid2{display:grid;grid-template-columns:1fr 1fr;gap:28px;margin-top:36px}
-.grid2 section{min-width:0}
-
-@media (max-width:760px){
-  .compare,.grid2{grid-template-columns:1fr}
-}
-@media (max-width:480px){
-  body{padding:44px 16px 72px}
-  h1{font-size:24px}
-}
-</style>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="header.css">
+<link rel="stylesheet" href="privacy.css">
 </head>
 <body>
 
 <a href="/" class="back">← verifi</a>
 
-<div class="masthead">
+<div class="head">
   <h1>privacy</h1>
   <span class="tag">no personal data collected</span>
 </div>
@@ -119,7 +83,7 @@ ul li::marker{color:var(--muted)}
   <section>
     <h2>data retention</h2>
     <ul>
-      <li>NN weight deltas: indefinite — only the most recent ~100 are ever used</li>
+      <li>NN weight deltas: indefinite — only the most recent ~500 are ever used</li>
       <li>IP reputation hashes: indefinite, updated on each visit</li>
       <li>site registrations: indefinite</li>
       <li>no session logs, no event logs, no raw IP logs</li>

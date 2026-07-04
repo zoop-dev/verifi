@@ -9,42 +9,15 @@
 <link rel="alternate icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,700&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#070a0e;--sf:#0c1018;--bd:rgba(255,255,255,.07);--bd-hover:rgba(255,255,255,.13);--text:#cdd6e0;--muted:#3d4f63;--blue:#00c8ff;--gn:#10b981;--am:#f59e0b;--pu:#a78bfa;--r:#ef4444}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{background:var(--bg);color:var(--text);font-family:'JetBrains Mono',ui-monospace,monospace;-webkit-font-smoothing:antialiased;font-size:13px;min-height:100vh}
-body{padding:60px 24px 100px;max-width:720px;margin:0 auto}
-a{color:var(--blue);text-decoration:none}
-a:hover{text-decoration:underline}
-a:focus-visible{outline:2px solid var(--blue);outline-offset:2px}
-.back{font-size:11px;color:var(--muted);display:inline-block;margin-bottom:32px}
-.back:hover{color:var(--text);text-decoration:none}
-
-.masthead{display:flex;align-items:baseline;justify-content:space-between;flex-wrap:wrap;gap:12px;border-bottom:1px solid var(--bd);padding-bottom:20px;margin-bottom:36px}
-h1{font-size:28px;font-weight:700;font-style:italic;color:var(--blue);letter-spacing:-.03em}
-.sub{font-size:11px;color:var(--muted)}
-
-.entry{margin-bottom:36px}
-.entry-head{display:flex;align-items:baseline;gap:12px;margin-bottom:14px}
-.entry-ver{font-size:14px;font-weight:700;color:var(--gn);font-style:italic}
-.entry-date{font-size:10px;color:var(--muted);letter-spacing:.04em}
-.entry ul{list-style:none;padding:0;display:flex;flex-direction:column;gap:8px}
-.entry li{font-size:12px;color:#4a5568;line-height:1.7;padding-left:18px;position:relative}
-.entry li::before{content:'—';position:absolute;left:0;color:var(--muted)}
-.tag{display:inline-block;font-size:9px;letter-spacing:.06em;text-transform:uppercase;padding:1px 6px;border-radius:3px;margin-right:6px;position:relative;top:-1px}
-.tag.new{background:rgba(16,185,129,.1);color:var(--gn)}
-.tag.fix{background:rgba(239,68,68,.1);color:var(--r)}
-.tag.sec{background:rgba(245,158,11,.1);color:var(--am)}
-.tag.chg{background:rgba(167,139,250,.1);color:var(--pu)}
-
-.empty{font-size:12px;color:var(--muted)}
-</style>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="header.css">
+<link rel="stylesheet" href="changelog.css">
 </head>
 <body>
 
 <a href="/" class="back">← verifi</a>
 
-<div class="masthead">
+<div class="head">
   <h1>changelog</h1>
   <div class="sub">what's changed</div>
 </div>
@@ -52,31 +25,6 @@ h1{font-size:28px;font-weight:700;font-style:italic;color:var(--blue);letter-spa
 <div id="changes"><div class="empty">loading…</div></div>
 
 <script src="changes.js"></script>
-<script>
-var TAG_LABELS = { sec: 'security', new: 'new', fix: 'fix', chg: 'changed' };
-var container = document.getElementById('changes');
-container.innerHTML = '';
-if (!window.CHANGES || !CHANGES.length) {
-  container.innerHTML = '<div class="empty">nothing here yet.</div>';
-} else {
-  CHANGES.forEach(function (entry) {
-    var wrap = document.createElement('div');
-    wrap.className = 'entry';
-    var head = document.createElement('div');
-    head.className = 'entry-head';
-    head.innerHTML = '<span class="entry-ver">v' + entry.version + '</span><span class="entry-date">' + entry.date + '</span>';
-    wrap.appendChild(head);
-    var ul = document.createElement('ul');
-    (entry.items || []).forEach(function (item) {
-      var li = document.createElement('li');
-      var label = TAG_LABELS[item.tag] || item.tag;
-      li.innerHTML = '<span class="tag ' + item.tag + '">' + label + '</span>' + item.text;
-      ul.appendChild(li);
-    });
-    wrap.appendChild(ul);
-    container.appendChild(wrap);
-  });
-}
-</script>
+<script src="changelog.js"></script>
 </body>
 </html>
