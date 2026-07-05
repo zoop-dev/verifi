@@ -135,7 +135,7 @@ w.verifi = {
   tokenExpiry: function () { return state._vTokenExp > 0 ? new Date(state._vTokenExp) : null; },
   isTokenValid: function () { return state._vToken && state._vTokenExp > Date.now(); },
   waitForToken: function (timeout) {
-    if (state._vToken) return Promise.resolve(state._vToken);
+    if (state._vToken && state._vTokenExp > Date.now()) return Promise.resolve(state._vToken);
     var ms = timeout || 10000;
     return new Promise(function (resolve, reject) {
       var t = setTimeout(function () { reject(new Error('token timeout')); }, ms);
@@ -146,6 +146,15 @@ w.verifi = {
 };
 
 (function () {
+  function aboutTrigger(cssText) {
+    var btn = d.createElement('button');
+    btn.type = 'button';
+    btn.style.cssText = 'border:none;background:none;padding:0;font:inherit;cursor:pointer;' + cssText;
+    btn.setAttribute('aria-label', 'about verifi');
+    btn.onclick = function (e) { e.stopPropagation(); _vshowAbout(); };
+    return btn;
+  }
+
   function renderWidget(el, theme, size, onPass, onFail) {
     if (typeof el === 'string') el = d.querySelector(el);
     if (!el) return;
@@ -157,38 +166,49 @@ w.verifi = {
     var text = isDark ? '#cdd6e0' : '#1a202c';
     var muted = isDark ? '#3d4f63' : '#718096';
     var blue = '#00c8ff';
-    var state2 = 'idle';
+    var current = 'idle';
+
     var wEl = d.createElement('div');
+    wEl.setAttribute('role', 'checkbox');
+    wEl.setAttribute('aria-checked', 'false');
+    wEl.setAttribute('tabindex', '0');
     wEl.style.cssText = 'display:inline-flex;align-items:center;gap:' + (compact ? '10' : '12') + 'px;background:' + bg + ';border:1px solid ' + bd + ';border-radius:8px;padding:' + (compact ? '8px 14px' : '12px 16px') + ';font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",ui-monospace,monospace;user-select:none;box-sizing:border-box;min-width:' + (compact ? 200 : 260) + 'px;cursor:pointer;transition:border-color .2s';
+
     var box = d.createElement('div');
     box.style.cssText = 'width:' + (compact ? '18' : '22') + 'px;height:' + (compact ? '18' : '22') + 'px;border-radius:5px;border:1.5px solid ' + bd + ';background:' + (isDark ? '#111820' : '#f7fafc') + ';display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:.2s';
+
     var label = d.createElement('div');
     label.style.cssText = 'display:flex;flex-direction:column;';
     var lt = d.createElement('span');
     lt.style.cssText = 'font-size:' + (compact ? '11' : '12') + 'px;font-weight:600;color:' + text + ';';
     lt.textContent = 'I am human';
-    var lb = d.createElement('span');
-    lb.style.cssText = 'font-size:9px;color:' + muted + ';margin-top:1px;cursor:pointer;text-decoration:underline;text-underline-offset:2px';
-    lb.onclick = function (e) { e.stopPropagation(); _vshowAbout(); };
+    lt.setAttribute('aria-live', 'polite');
+    var lb = aboutTrigger('font-size:9px;color:' + muted + ';margin-top:1px;text-decoration:underline;text-underline-offset:2px');
     lb.textContent = 'verifi';
     label.appendChild(lt);
     if (!compact) label.appendChild(lb);
-    var logo = d.createElement('div');
-    logo.style.cssText = 'margin-left:auto;font-size:9px;font-weight:700;font-style:italic;color:' + blue + ';letter-spacing:.02em;flex-shrink:0;cursor:pointer';
-    logo.onclick = function (e) { e.stopPropagation(); _vshowAbout(); };
+
+    var logo = aboutTrigger('margin-left:auto;font-size:9px;font-weight:700;font-style:italic;color:' + blue + ';letter-spacing:.02em;flex-shrink:0');
     logo.textContent = 'verifi';
+
     wEl.appendChild(box); wEl.appendChild(label); wEl.appendChild(logo);
     el.innerHTML = ''; el.appendChild(wEl);
+
     var spinner = '<svg width="12" height="12" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" style="animation:_vw_spin .7s linear infinite"><style>@keyframes _vw_spin{to{transform:rotate(360deg)}}</style><circle cx="12" cy="12" r="10" fill="none" stroke="' + blue + '" stroke-width="3" stroke-dasharray="31.4" stroke-dashoffset="10"/></svg>';
     var check = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#10b981" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
     var cross = '<svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="#ef4444" stroke-width="3" stroke-linecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>';
+
     function setState(s, data) {
-      state2 = s;
+      current = s;
       if (s === 'checking') {
+        wEl.setAttribute('aria-checked', 'false');
+        wEl.setAttribute('aria-busy', 'true');
         box.innerHTML = spinner; box.style.borderColor = blue;
         lt.textContent = 'verifying…'; wEl.style.cursor = 'default';
         wEl.style.borderColor = 'rgba(0,200,255,.25)';
       } else if (s === 'pass') {
+        wEl.setAttribute('aria-checked', 'true');
+        wEl.removeAttribute('aria-busy');
         box.innerHTML = check; box.style.borderColor = '#10b981';
         box.style.background = 'rgba(16,185,129,.1)';
         lt.textContent = 'verified'; lt.style.color = '#10b981';
@@ -197,15 +217,18 @@ w.verifi = {
         el.dispatchEvent(new CustomEvent('verifi:pass', { bubbles: true, detail: data }));
         if (onPass) onPass(data);
       } else if (s === 'fail') {
+        wEl.setAttribute('aria-checked', 'false');
+        wEl.removeAttribute('aria-busy');
         box.innerHTML = cross; box.style.borderColor = '#ef4444';
         lt.textContent = 'try again'; lt.style.color = '#ef4444';
         wEl.style.cursor = 'pointer'; wEl.style.borderColor = 'rgba(239,68,68,.2)';
-        state2 = 'idle';
+        current = 'idle';
         if (onFail) onFail(data);
       }
     }
-    wEl.addEventListener('click', function () {
-      if (state2 !== 'idle') return;
+
+    function activate() {
+      if (current !== 'idle') return;
       setState('checking');
       _vupdSc();
       var tier = _getTier();
@@ -221,7 +244,21 @@ w.verifi = {
           else { runChallenge(pass, fail); }
         }, 1200);
       } else { runChallenge(pass, fail); }
+    }
+
+    wEl.addEventListener('click', activate);
+    wEl.addEventListener('keydown', function (e) {
+      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); activate(); }
     });
+
+    // already verified elsewhere on the page, or gets verified later without a click
+    if (state._vToken && state._vTokenExp > Date.now()) {
+      setState('pass', { token: state._vToken, probability: _vSc.p, confidence: _vSc.c });
+    } else {
+      w.verifi.on('token', function (d) {
+        if (current === 'idle') setState('pass', { token: d.token, probability: d.probability, confidence: d.confidence });
+      });
+    }
   }
   w.verifi = w.verifi || {};
   w.verifi.embed = function (el, theme, size, onPass, onFail) { renderWidget(el, theme, size, onPass, onFail); return w.verifi; };
