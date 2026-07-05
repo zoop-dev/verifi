@@ -30,16 +30,13 @@ export async function onRequestPost({ request, env, context }) {
 
     const cfAsn = request.cf?.asn ? Number(request.cf.asn) : 0;
     const asn = cfAsn || (body.asn ? Number(body.asn) : 0);
-    const threatScore = request.cf?.threatScore ? Number(request.cf.threatScore) : 0;
     const isDatacenter = DC_ASNS.has(asn);
 
     const flags = [];
-    let penalty = 0;
-    if (isDatacenter) { penalty -= 0.25; flags.push('datacenter'); }
-    if (threatScore > 50) { penalty -= 0.20; flags.push('cf_threat'); }
-    if (threatScore > 80) { penalty -= 0.15; flags.push('cf_threat_high'); }
+    if (isDatacenter) flags.push('datacenter');
 
     const ipRep = ip ? await lookupIpReputation(ip) : { score: 50, flags: [], found: false };
+    const hasFailedBefore = (ipRep.flags || []).includes('failed_challenge');
 
     const clientP = (body.p != null && body.p >= 0 && body.p <= 1) ? body.p : null;
     const reportedBotScore = clientP != null ? Math.round((1 - clientP) * 100) : null;
@@ -54,16 +51,16 @@ export async function onRequestPost({ request, env, context }) {
     }
 
     if (isDatacenter) botScore = Math.min(100, botScore + 25);
-    if (threatScore > 50) botScore = Math.min(100, botScore + 20);
+    if (hasFailedBefore) botScore = Math.min(100, botScore + 15);
     botScore = Math.max(0, Math.min(100, botScore));
 
     if (body.fail) botScore = Math.min(100, botScore + 20);
 
     const allFlags = [...new Set([...flags, ...(ipRep.flags || [])])];
-    if (body.fail && !allFlags.includes('failed_challenge')) allFlags.push('failed_challenge');
+    if (body.blocked && !allFlags.includes('failed_challenge')) allFlags.push('failed_challenge');
     const finalPenalty = -((botScore - 50) / 200);
 
-    debug.push(`clientP=${clientP} reportedBot=${reportedBotScore} finalBot=${botScore}`);
+    debug.push(`clientP=${clientP} reportedBot=${reportedBotScore} finalBot=${botScore} hasFailedBefore=${hasFailedBefore}`);
 
     let upsertStatus = 0;
     if (ip) {
@@ -81,7 +78,6 @@ export async function onRequestPost({ request, env, context }) {
       penalty: Math.round(finalPenalty * 1000) / 1000,
       cached: ipRep.found,
       dc: isDatacenter,
-      threat: threatScore,
       debug,
     }), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
 

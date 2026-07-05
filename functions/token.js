@@ -60,11 +60,14 @@ export async function onRequestPost({ request, env }) {
     const ipInfo = await getIpInfo(request, env);
     const ipRep = await lookupIpReputation(ipInfo.ip);
     const serverPenalty = ipInfo.penalty + (ipRep.found && ipRep.score > 70 ? -0.15 : 0);
-    const allFlags = [...new Set([...ipInfo.flags, ...(ipRep.flags || [])])];
     const adjustedP = Math.max(0, Math.min(1, (probability || 0) + serverPenalty));
+
+    const rawFlags = [...new Set([...ipInfo.flags, ...(ipRep.flags || [])])];
+    const redeemed = adjustedP >= 0.6;
+    const allFlags = redeemed ? rawFlags.filter(f => f !== 'failed_challenge') : rawFlags;
+
     const passBot = Math.round((1 - adjustedP) * 100);
-    const existingScore = (await lookupIpReputation(ipInfo.ip)).score || 50;
-    const blendedScore = Math.round(existingScore * 0.7 + passBot * 0.3);
+    const blendedScore = Math.round((ipRep.score || 50) * 0.7 + passBot * 0.3);
     await recordIpHit(ipInfo.ip, blendedScore, allFlags);
 
     const now = Math.floor(Date.now() / 1000);

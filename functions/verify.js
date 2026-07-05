@@ -70,6 +70,7 @@ export async function onRequestPost({ request, env }) {
       domain: payload.domain,
       probability: payload.p,
       confidence: payload.c,
+      flags: payload.flags || [],
       issued_at: payload.iat,
       expires_at: payload.exp,
     }), {

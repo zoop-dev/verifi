@@ -1,5 +1,14 @@
 var CHANGES = [
   {
+    version: '1.4.1',
+    date: '2026-07-05',
+    items: [
+      { tag: 'chg', text: 'dropped the cf_threat flags, they needed a paid cloudflare feature we dont have so they never actually fired' },
+      { tag: 'fix', text: 'the failed_challenge flag used to just sit there doing nothing forever once set. now it actually adds real scrutiny to future visits, and clears itself once you pass a check cleanly' },
+      { tag: 'new', text: '/verify now actually tells your backend which flags a token has instead of eating that info silently' }
+    ]
+  },
+  {
     version: '1.4.0',
     date: '2026-07-05',
     items: [

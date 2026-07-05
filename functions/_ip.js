@@ -37,7 +37,6 @@ export async function getIpInfo(request, env) {
   if (!secret) throw new Error('VERIFI_IP_SECRET not set');
   const ip = rawIp ? await hashIp(rawIp, secret) : '';
   const asn = cf.asn ? Number(cf.asn) : 0;
-  const threatScore = cf.threatScore ? Number(cf.threatScore) : 0;
   const isDatacenter = DC_ASNS.has(asn);
   const country = cf.country || '';
   const org = cf.asOrganization || '';
@@ -46,10 +45,8 @@ export async function getIpInfo(request, env) {
   const flags = [];
 
   if (isDatacenter) { penalty -= 0.25; flags.push('datacenter'); }
-  if (threatScore > 50) { penalty -= 0.20; flags.push('cf_threat'); }
-  if (threatScore > 80) { penalty -= 0.15; flags.push('cf_threat_high'); }
 
-  return { ip, asn, threatScore, isDatacenter, country, org, flags, penalty };
+  return { ip, asn, isDatacenter, country, org, flags, penalty };
 }
 
 export async function lookupIpReputation(ip) {
