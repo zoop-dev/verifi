@@ -20,7 +20,7 @@ var CHANGES = [
     date: '2026-07-04',
     items: [
       { tag: 'new', text: 'added basic per-site pass/fail counts, admin-only for now' },
-      { tag: 'fix', text: 'a db lockdown had quietly broken ip reputation tracking completely, fixed' }
+      { tag: 'fix', text: 'a db lockdown broke ip reputation tracking and nobody noticed until now, fixed' }
     ]
   },
   {
