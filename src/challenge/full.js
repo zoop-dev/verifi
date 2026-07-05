@@ -905,6 +905,7 @@ export function runChallenge(onPass, onFail) {
     status.style.color = '#ef4444';
     status.textContent = 'session blocked';
     try { sessionStorage.setItem('_vf_blocked', '1'); } catch (e) {}
+    try { fetch(_POW_URL.replace('/pow-verify', '/ping'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ site_id: _SITE_ID, blocked: true }) }).catch(function () {}); } catch (e) {}
   }
 
   btn.addEventListener('click', function () {

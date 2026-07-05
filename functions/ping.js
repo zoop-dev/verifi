@@ -71,7 +71,7 @@ export async function onRequestPost({ request, env, context }) {
       debug.push(`upsert=${upsertStatus}`);
     }
 
-    if (body.fail && body.site_id) {
+    if (body.blocked && body.site_id) {
       await bumpFail(body.site_id);
     }
 
