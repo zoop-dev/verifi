@@ -1,5 +1,12 @@
 var CHANGES = [
   {
+    version: '1.4.0',
+    date: '2026-07-05',
+    items: [
+      { tag: 'sec', text: 'added a light obfuscation pass on top of minification, just makes it a bit more annoying to read the source and figure out how the detection works' }
+    ]
+  },
+  {
     version: '1.3.2',
     date: '2026-07-05',
     items: [
