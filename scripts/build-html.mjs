@@ -3,9 +3,9 @@ import { minify } from 'html-minifier-terser';
 import { minify as minifyJs } from 'terser';
 import CleanCSS from 'clean-css';
 
-const pages = ['index.html', 'privacy.html', 'changelog.html'];
-const styles = ['style.css', 'header.css', 'index.css', 'privacy.css', 'changelog.css'];
-const scripts = ['index.js', 'changelog.js', 'changes.js'];
+const pages = ['index.html', 'privacy.html', 'changelog.html', 'admin.html'];
+const styles = ['style.css', 'header.css', 'index.css', 'privacy.css', 'changelog.css', 'admin.css'];
+const scripts = ['index.js', 'changelog.js', 'changes.js', 'admin.js'];
 
 await mkdir(new URL('../dist', import.meta.url), { recursive: true });
 

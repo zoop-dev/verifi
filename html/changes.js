@@ -1,5 +1,13 @@
 var CHANGES = [
   {
+    version: '1.3.1',
+    date: '2026-07-05',
+    items: [
+      { tag: 'fix', text: 'a visitor who briefly failed the quick check but then passed the harder challenge was getting counted as both a pass and a fail — now only counts against you if the session actually got blocked' },
+      { tag: 'new', text: 'added a real page for the stats instead of just raw json — locked to a private admin link only' }
+    ]
+  },
+  {
     version: '1.3.0',
     date: '2026-07-04',
     items: [

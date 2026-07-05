@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>admin — verifi</title>
+<meta name="robots" content="noindex, nofollow">
+<link rel="icon" href="/favicon.svg" type="image/svg+xml">
+<link rel="alternate icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,400;0,600;0,700;1,700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="header.css">
+<link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+<div class="head">
+  <h1>admin</h1>
+</div>
+
+<div id="gate"></div>
+
+<div class="lookup" id="lookup" style="display:none">
+  <input id="site-inp" placeholder="site id" maxlength="40" autocomplete="off">
+  <button class="btn" id="lookup-btn" onclick="lookupStats()">look up</button>
+</div>
+
+<div class="totals" id="totals">
+  <div class="stat-card">
+    <div class="stat-num pass" id="total-passes">0</div>
+    <div class="stat-label">passed</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-num fail" id="total-fails">0</div>
+    <div class="stat-label">blocked</div>
+  </div>
+</div>
+
+<table id="days-table">
+  <thead><tr><th>day</th><th>passed</th><th>blocked</th></tr></thead>
+  <tbody id="days-body"></tbody>
+</table>
+
+<div class="err" id="err"></div>
+
+<script src="admin.js"></script>
+</body>
+</html>
