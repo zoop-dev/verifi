@@ -12,6 +12,18 @@ export async function lookupSite(id) {
   return null;
 }
 
+export async function listSites() {
+  try {
+    const r = await fetch(`${SB_URL}/rest/v1/verifi_sites?select=id,name,domain,created_at&order=created_at.desc&limit=200`, {
+      headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
+    });
+    const rows = await r.json();
+    return Array.isArray(rows) ? rows : [];
+  } catch {
+    return [];
+  }
+}
+
 export function normalizeDomain(input) {
   const s = (input || '').trim().toLowerCase();
   if (!s) return '';

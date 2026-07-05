@@ -1,5 +1,13 @@
 var CHANGES = [
   {
+    version: '1.3.2',
+    date: '2026-07-05',
+    items: [
+      { tag: 'new', text: 'admin page now lists every registered site so you dont have to remember ids — click one to load its stats' },
+      { tag: 'new', text: 'added a total verifications count alongside passed/blocked' }
+    ]
+  },
+  {
     version: '1.3.1',
     date: '2026-07-05',
     items: [

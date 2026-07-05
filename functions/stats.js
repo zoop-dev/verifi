@@ -1,5 +1,6 @@
 import { getStats } from './_stats.js';
 import { rateLimit } from './_ratelimit.js';
+import { listSites } from './_sites.js';
 
 export async function onRequestGet({ request, env }) {
   const adminKey = env?.VERIFI_ADMIN_KEY;
@@ -18,7 +19,8 @@ export async function onRequestGet({ request, env }) {
 
   const siteId = url.searchParams.get('site_id');
   if (!siteId) {
-    return new Response(JSON.stringify({ error: 'site_id required' }), { status: 400, headers: { 'Content-Type': 'application/json' } });
+    const sites = await listSites();
+    return new Response(JSON.stringify({ sites }), { status: 200, headers: { 'Content-Type': 'application/json' } });
   }
 
   const stats = await getStats(siteId);

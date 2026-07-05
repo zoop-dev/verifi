@@ -4,6 +4,50 @@ if (!ADMIN_KEY) {
   document.getElementById('gate').innerHTML = '<p class="nokey">missing ?key= in the url.</p>';
 } else {
   document.getElementById('lookup').style.display = 'flex';
+  loadSites();
+}
+
+async function loadSites() {
+  var container = document.getElementById('sites-list');
+  try {
+    var res = await fetch('/stats?admin_key=' + encodeURIComponent(ADMIN_KEY));
+    var data = await res.json();
+    if (data.error) throw new Error(data.error);
+    if (!data.sites.length) {
+      container.innerHTML = '<p class="empty">no sites yet.</p>';
+      return;
+    }
+    var ul = document.createElement('ul');
+    ul.className = 'sites';
+    data.sites.forEach(function (site) {
+      var li = document.createElement('li');
+
+      var nameSpan = document.createElement('span');
+      nameSpan.className = 'site-name';
+      nameSpan.textContent = site.name;
+
+      var metaSpan = document.createElement('span');
+      metaSpan.className = 'site-meta';
+      metaSpan.appendChild(document.createTextNode(site.domain || ''));
+      metaSpan.appendChild(document.createElement('br'));
+      var idSpan = document.createElement('span');
+      idSpan.className = 'site-id';
+      idSpan.textContent = site.id;
+      metaSpan.appendChild(idSpan);
+
+      li.appendChild(nameSpan);
+      li.appendChild(metaSpan);
+      li.addEventListener('click', function () {
+        document.getElementById('site-inp').value = site.id;
+        lookupStats();
+      });
+      ul.appendChild(li);
+    });
+    container.innerHTML = '';
+    container.appendChild(ul);
+  } catch (e) {
+    container.innerHTML = '<p class="empty">couldnt load sites: ' + e.message + '</p>';
+  }
 }
 
 async function lookupStats() {
@@ -17,6 +61,7 @@ async function lookupStats() {
     var res = await fetch('/stats?site_id=' + encodeURIComponent(siteId) + '&admin_key=' + encodeURIComponent(ADMIN_KEY));
     var data = await res.json();
     if (data.error) throw new Error(data.error);
+    document.getElementById('total-verifications').textContent = data.totals.passes + data.totals.fails;
     document.getElementById('total-passes').textContent = data.totals.passes;
     document.getElementById('total-fails').textContent = data.totals.fails;
     totals.style.display = 'grid';
