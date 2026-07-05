@@ -3,16 +3,16 @@ var CHANGES = [
     version: '1.3.2',
     date: '2026-07-05',
     items: [
-      { tag: 'new', text: 'admin page now lists every registered site so you dont have to remember ids — click one to load its stats' },
-      { tag: 'new', text: 'added a total verifications count alongside passed/blocked' }
+      { tag: 'new', text: 'admin page lists every site now, click one instead of typing the id' },
+      { tag: 'new', text: 'added a total verifications number next to passed/blocked' }
     ]
   },
   {
     version: '1.3.1',
     date: '2026-07-05',
     items: [
-      { tag: 'fix', text: 'a visitor who briefly failed the quick check but then passed the harder challenge was getting counted as both a pass and a fail — now only counts against you if the session actually got blocked' },
-      { tag: 'new', text: 'added a real page for the stats instead of just raw json — locked to a private admin link only' }
+      { tag: 'fix', text: 'fixed double counting — failing the quick check then passing the harder one counted as both a pass and a fail. now it only counts as a fail if you actually get blocked' },
+      { tag: 'new', text: 'made an actual page for the stats instead of raw json, still just for me though' }
     ]
   },
   {
@@ -20,7 +20,7 @@ var CHANGES = [
     date: '2026-07-04',
     items: [
       { tag: 'new', text: 'added basic per-site pass/fail counts, admin-only for now' },
-      { tag: 'fix', text: 'fixed a database lockdown that had accidentally broken ip reputation tracking entirely' }
+      { tag: 'fix', text: 'a db lockdown had quietly broken ip reputation tracking completely, fixed' }
     ]
   },
   {
@@ -29,7 +29,7 @@ var CHANGES = [
     items: [
       { tag: 'new', text: 'added a keyboard-only fallback ("trouble with mouse or touch?") for the harder challenges — press and hold enter/space instead of dragging or drawing' },
       { tag: 'chg', text: 'the check buttons are real buttons now, so you can tab to them and hit enter instead of needing a mouse click' },
-      { tag: 'chg', text: 'added screen reader labels to the verification popups so they announce what is happening instead of staying silent' }
+      { tag: 'chg', text: 'screen readers can actually announce whats going on in the verify popups now instead of dead silence' }
     ]
   },
   {
