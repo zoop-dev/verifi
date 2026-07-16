@@ -1,5 +1,14 @@
 var CHANGES = [
   {
+    version: '1.5.0',
+    date: '2026-07-16',
+    items: [
+      { tag: 'new', text: 'real dashboard for stats now — charts, csv export, and site owners can get their own private link instead of needing my admin key' },
+      { tag: 'sec', text: 'found and closed a hole where the per-site dashboard key wouldve been readable by anyone with the public anon key. now it needs a separate service key that never ships to the browser' },
+      { tag: 'fix', text: 'canvas charts werent picking up the blue accent color (css variables dont work in canvas), and the donut chart had a small rendering gap where the two arcs met' }
+    ]
+  },
+  {
     version: '1.4.1',
     date: '2026-07-05',
     items: [

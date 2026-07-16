@@ -12,6 +12,12 @@ async function register(){
     if(data.error)throw new Error(data.error);
     document.getElementById('out-id').textContent=data.id;
     document.getElementById('snip-id').textContent=data.id;
+    if (data.admin_key) {
+      var adminLink = document.getElementById('admin-link');
+      var adminAnchor = document.getElementById('admin-anchor');
+      adminAnchor.href = '/admin?site_id=' + encodeURIComponent(data.id) + '&key=' + encodeURIComponent(data.admin_key);
+      adminLink.style.display = 'block';
+    }
     result.style.display='block';
   }catch(e){err.textContent='error: '+e.message;err.style.display='block';}
   finally{btn.disabled=false;btn.textContent='get site id';}

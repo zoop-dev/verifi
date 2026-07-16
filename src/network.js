@@ -9,29 +9,19 @@ import { _POW_URL, _SITE_ID } from './site-config.js';
 
 (function () {
   try {
-    function doPing(clientIp, asn, isp) {
-      fetch(_POW_URL.replace('/pow-verify', '/ping'), {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ site_id: _SITE_ID, ip: clientIp || '', asn: asn || '', isp: isp || '', p: _vSc && _vSc.p != null ? _vSc.p : null }),
-      }).then(function (r) { return r.json(); }).then(function (data) {
-        state._vIpPenalty = data.penalty || 0;
-        state._vIpFlags = data.flags || [];
-        if (state._vIpPenalty !== 0) {
-          _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + state._vIpPenalty));
-          _vsave(); _vupdSc();
-        }
-        if (data.dc || data.bot_score > 75) { state._vIpFlags.push('fast_challenge'); }
-      }).catch(function () {});
-    }
-    fetch('https://wimi-api-v4.whatismyip.com/app/ip', {
+    fetch(_POW_URL.replace('/pow-verify', '/ping'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ tool: 'ip' }),
-    }).then(function (r) { return r.json(); }).then(function (d) {
-      var dat = d && d.data || {};
-      doPing(dat.ip || '', dat.asn || '', dat.isp || '');
-    }).catch(function () { doPing('', '', ''); });
+      body: JSON.stringify({ site_id: _SITE_ID, p: _vSc && _vSc.p != null ? _vSc.p : null }),
+    }).then(function (r) { return r.json(); }).then(function (data) {
+      state._vIpPenalty = data.penalty || 0;
+      state._vIpFlags = data.flags || [];
+      if (state._vIpPenalty !== 0) {
+        _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + state._vIpPenalty));
+        _vsave(); _vupdSc();
+      }
+      if (data.dc || data.bot_score > 75) { state._vIpFlags.push('fast_challenge'); }
+    }).catch(function () {});
   } catch (e) {}
 })();
 

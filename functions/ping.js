@@ -15,21 +15,20 @@ export async function onRequestPost({ request, env, context }) {
   const debug = [];
   try {
     const body = await request.json().catch(() => ({}));
-    const rawIp = request.headers.get('cf-connecting-ip')
-      || request.headers.get('x-real-ip')
-      || request.headers.get('x-forwarded-for')?.split(',')[0]?.trim()
-      || body.ip || '';
-
-    debug.push(`rawIp=${rawIp || '(empty)'}`);
+    const rawIp = request.headers.get('cf-connecting-ip') || '';
+    if (!rawIp) {
+      return new Response(JSON.stringify({ bot_score: 50, flags: [], penalty: 0, error: 'missing cf-connecting-ip' }), {
+        status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
+      });
+    }
 
     const secret = env?.VERIFI_IP_SECRET;
     if (!secret) throw new Error('VERIFI_IP_SECRET not set');
-    const ip = rawIp ? await hashIp(rawIp, secret) : '';
+    const ip = await hashIp(rawIp, secret);
 
-    debug.push(`hash=${ip || '(empty)'}`);
+    debug.push(`hasIp=true`);
 
-    const cfAsn = request.cf?.asn ? Number(request.cf.asn) : 0;
-    const asn = cfAsn || (body.asn ? Number(body.asn) : 0);
+    const asn = request.cf?.asn ? Number(request.cf.asn) : 0;
     const isDatacenter = DC_ASNS.has(asn);
 
     const flags = [];

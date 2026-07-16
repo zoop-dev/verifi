@@ -1,0 +1,101 @@
+{
+  "routes": [
+    {
+      "routePath": "/api/register",
+      "mountPath": "/api",
+      "method": "OPTIONS",
+      "module": [
+        "api/register.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/api/register",
+      "mountPath": "/api",
+      "method": "POST",
+      "module": [
+        "api/register.js:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/ping",
+      "mountPath": "/",
+      "method": "OPTIONS",
+      "module": [
+        "ping.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/ping",
+      "mountPath": "/",
+      "method": "POST",
+      "module": [
+        "ping.js:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/pow-verify",
+      "mountPath": "/",
+      "method": "OPTIONS",
+      "module": [
+        "pow-verify.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/pow-verify",
+      "mountPath": "/",
+      "method": "POST",
+      "module": [
+        "pow-verify.js:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/stats",
+      "mountPath": "/",
+      "method": "GET",
+      "module": [
+        "stats.js:onRequestGet"
+      ]
+    },
+    {
+      "routePath": "/stats",
+      "mountPath": "/",
+      "method": "OPTIONS",
+      "module": [
+        "stats.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/token",
+      "mountPath": "/",
+      "method": "OPTIONS",
+      "module": [
+        "token.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/token",
+      "mountPath": "/",
+      "method": "POST",
+      "module": [
+        "token.js:onRequestPost"
+      ]
+    },
+    {
+      "routePath": "/verify",
+      "mountPath": "/",
+      "method": "OPTIONS",
+      "module": [
+        "verify.js:onRequestOptions"
+      ]
+    },
+    {
+      "routePath": "/verify",
+      "mountPath": "/",
+      "method": "POST",
+      "module": [
+        "verify.js:onRequestPost"
+      ]
+    }
+  ],
+  "baseURL": "/"
+}

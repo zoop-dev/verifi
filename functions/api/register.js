@@ -1,5 +1,5 @@
 import { SB_URL, SB_KEY } from '../_config.js';
-import { normalizeDomain } from '../_sites.js';
+import { normalizeDomain, hasValidTld } from '../_sites.js';
 import { rateLimit } from '../_ratelimit.js';
 
 const CORS = {
@@ -10,6 +10,12 @@ const CORS = {
 
 function uid() {
   const bytes = new Uint8Array(8);
+  crypto.getRandomValues(bytes);
+  return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
+}
+
+function adminKey() {
+  const bytes = new Uint8Array(16);
   crypto.getRandomValues(bytes);
   return Array.from(bytes, b => b.toString(16).padStart(2, '0')).join('');
 }
@@ -30,21 +36,23 @@ export async function onRequestPost({ request, env }) {
       return new Response(JSON.stringify({ error: 'name required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
     const normalizedDomain = normalizeDomain(domain);
-    if (!normalizedDomain) {
-      return new Response(JSON.stringify({ error: 'valid domain required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
+    if (!normalizedDomain || !hasValidTld(normalizedDomain)) {
+      return new Response(JSON.stringify({ error: 'valid domain with TLD required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
 
     const id = uid();
+    const key = adminKey();
     const res = await fetch(`${SB_URL}/rest/v1/verifi_sites`, {
       method: 'POST',
       headers: {
         apikey: SB_KEY,
         Authorization: `Bearer ${SB_KEY}`,
         'Content-Type': 'application/json',
-        Prefer: 'return=representation',
+        Prefer: 'return=minimal',
       },
       body: JSON.stringify({
         id,
+        admin_key: key,
         name: name.trim().slice(0, 100),
         domain: normalizedDomain,
         created_at: new Date().toISOString(),
@@ -56,7 +64,7 @@ export async function onRequestPost({ request, env }) {
       return new Response(JSON.stringify({ error: 'db error', detail: err }), { status: 500, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
 
-    return new Response(JSON.stringify({ id, name: name.trim(), domain: normalizedDomain }), {
+    return new Response(JSON.stringify({ id, admin_key: key, name: name.trim(), domain: normalizedDomain }), {
       status: 200,
       headers: { ...CORS, 'Content-Type': 'application/json' },
     });

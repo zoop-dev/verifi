@@ -30,9 +30,7 @@ export async function hashIp(ip, secret) {
 
 export async function getIpInfo(request, env) {
   const cf = request.cf || {};
-  const rawIp = request.headers.get('cf-connecting-ip') ||
-                request.headers.get('x-real-ip') ||
-                request.headers.get('x-forwarded-for')?.split(',')[0]?.trim() || '';
+  const rawIp = request.headers.get('cf-connecting-ip') || '';
   const secret = env?.VERIFI_IP_SECRET;
   if (!secret) throw new Error('VERIFI_IP_SECRET not set');
   const ip = rawIp ? await hashIp(rawIp, secret) : '';
