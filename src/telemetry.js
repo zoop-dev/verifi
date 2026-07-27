@@ -1,4 +1,4 @@
-import { w, d } from './env.js';
+import { w, d, _vIsMobile } from './env.js';
 import { state } from './state.js';
 import { _vP, _vsave } from './storage.js';
 import { _vbayes, _vinfer, _vembed } from './nn.js';
@@ -26,10 +26,12 @@ export function _vupdScore() {
 
   })();
 
-  var behSigs = [_vP.sig.tr, _vP.sig.sc, _vP.sig.cl, _vP.sig.vel].filter(Boolean);
+  var behSigs = _vIsMobile
+    ? [_vP.sig.sc, _vP.sig.cl, _vP.sig.to, _vP.sig.vel].filter(Boolean)
+    : [_vP.sig.tr, _vP.sig.sc, _vP.sig.cl, _vP.sig.vel].filter(Boolean);
   var allZero = behSigs.every(function (s) { return s.c < 0.05 });
   var elapsed = (Date.now() - (_vStart || Date.now())) / 1000;
-  if (allZero && elapsed > 10) _vP.hp = _vbayes(_vP.hp, 0.2, 0.3);
+  if (allZero && elapsed > 10) _vP.hp = _vbayes(_vP.hp, 0.2, _vIsMobile ? 0.15 : 0.3);
   _vP.hp = Math.max(0, Math.min(1, _vP.hp));
   var ac = sigs.reduce(function (a, s) { return a + s.c }, 0) / (sigs.length || 1);
   _vSc = { p: _vP.hp, c: ac, sig: _vP.sig, ts: _vP.ts, nn: _vSeq.length >= 4 ? _vinfer(_vSeq) : null };
@@ -96,8 +98,8 @@ w.addEventListener('scroll', function () {
 }, { passive: true, capture: true });
 d.addEventListener('keydown', function () { _vKB.push({ t: Date.now() }); _vLastKeyT = Date.now(); }, true);
 d.addEventListener('click', function (e) { _vCB.push({ x: e.clientX, y: e.clientY, vw: w.innerWidth, vh: w.innerHeight, t: Date.now() }); }, true);
-d.addEventListener('touchstart', function (e) { var t = e.touches[0]; if (t) { _vTB.push({ force: t.force || 0, r: (t.radiusX || 0) + (t.radiusY || 0), t: Date.now() }); } }, { passive: true, capture: true });
-d.addEventListener('touchmove', function (e) { var t = e.touches[0]; if (t) { _vTB.push({ force: t.force || 0, r: (t.radiusX || 0) + (t.radiusY || 0), t: Date.now() }); } }, { passive: true, capture: true });
+d.addEventListener('touchstart', function (e) { var t = e.touches[0]; if (!t) return; _vTB.push({ force: t.force || 0, r: (t.radiusX || 0) + (t.radiusY || 0), t: Date.now() }); _vMB.push({ x: t.clientX, y: t.clientY, t: Date.now() }); if (_vMB.length > 512) _vMB = _vMB.slice(-256); }, { passive: true, capture: true });
+d.addEventListener('touchmove', function (e) { var t = e.touches[0]; if (!t) return; _vTB.push({ force: t.force || 0, r: (t.radiusX || 0) + (t.radiusY || 0), t: Date.now() }); _vMB.push({ x: t.clientX, y: t.clientY, t: Date.now() }); if (_vMB.length > 512) _vMB = _vMB.slice(-256); }, { passive: true, capture: true });
 
 var _mdT = 0;
 d.addEventListener('mousedown', function () { _mdT = Date.now(); }, true);

@@ -1,16 +1,25 @@
 import { _VNN } from './nn.js';
 import { _vP } from './storage.js';
 import { _vsave } from './storage.js';
+import { _vIsMobile } from './env.js';
 
 var _SB_URL = 'https://ymfgcndmekugcwiivrof.supabase.co';
 var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltZmdjbmRtZWt1Z2N3aWl2cm9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzODMwNTksImV4cCI6MjA5Mzk1OTA1OX0.sMR3ooeVVvEuW_R1GwcrNscLr94iFrF_GK614rME-m4';
 export var _vSynced = false;
 
 export function _vfetchWeights() {
+  var plat = _vIsMobile ? 'mobile' : 'desktop';
   try {
-    fetch(_SB_URL + '/rest/v1/verifi_weights?order=created_at.desc&limit=500', {
+    fetch(_SB_URL + '/rest/v1/verifi_weights?platform=eq.' + plat + '&order=created_at.desc&limit=500', {
       headers: { apikey: _SB_KEY, Authorization: 'Bearer ' + _SB_KEY }
     }).then(function (r) { return r.json(); }).then(function (rows) {
+      if (!rows || !rows.length) {
+        return fetch(_SB_URL + '/rest/v1/verifi_weights?order=created_at.desc&limit=500', {
+          headers: { apikey: _SB_KEY, Authorization: 'Bearer ' + _SB_KEY }
+        }).then(function (r) { return r.json(); });
+      }
+      return rows;
+    }).then(function (rows) {
       if (!rows || !rows.length) return;
 
       var avgWo = new Float32Array(16), avgBo = 0, totalW = 0;
@@ -40,7 +49,7 @@ export function _vpushWeights(label) {
     fetch(_SB_URL + '/rest/v1/verifi_weights', {
       method: 'POST',
       headers: { apikey: _SB_KEY, Authorization: 'Bearer ' + _SB_KEY, 'Content-Type': 'application/json', Prefer: 'return=minimal' },
-      body: JSON.stringify({ wo: Array.from(_VNN.Wo), bo: _VNN.bo, sessions: _vP.ts, label: label || 'human' })
+      body: JSON.stringify({ wo: Array.from(_VNN.Wo), bo: _VNN.bo, sessions: _vP.ts, label: label || 'human', platform: _vIsMobile ? 'mobile' : 'desktop' })
     }).catch(function () {});
   } catch (e) {}
 }

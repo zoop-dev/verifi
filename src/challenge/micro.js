@@ -1,4 +1,4 @@
-import { w, d } from '../env.js';
+import { w, d, _vIsMobile } from '../env.js';
 import { state } from '../state.js';
 import { lsSet } from '../site-config.js';
 import { _vlock, _vunlock, _vshowAbout } from '../about.js';
@@ -60,7 +60,9 @@ export function runMicroChallenge(onPass, onFail) {
     if (!navigator.webdriver) humanScore += 20;
     humanScore += Math.min(30, Math.round(_behScore() * 0.3));
 
-    if (humanScore >= 55 || (_vSc.p >= 0.65 && _vSc.c >= 0.25)) {
+    var passThreshold = _vIsMobile ? 40 : 55;
+    var scorePass = _vIsMobile ? (_vSc.p >= 0.5 && _vSc.c >= 0.15) : (_vSc.p >= 0.65 && _vSc.c >= 0.25);
+    if (humanScore >= passThreshold || scorePass) {
 
       bar.style.width = '100%';
       bar.style.background = '#10b981';
@@ -117,7 +119,8 @@ export function runMicroChallenge(onPass, onFail) {
           if (!navigator.webdriver) hs2 += 25;
           hs2 += Math.min(40, Math.round(_behScore() * 0.4));
           if (elapsed2 > 400) hs2 += 20;
-          if (hs2 >= 60) {
+          var clickThreshold = _vIsMobile ? 45 : 60;
+          if (hs2 >= clickThreshold) {
             bar.style.width = '100%'; bar.style.background = '#10b981';
             title.style.color = '#10b981'; title.textContent = 'verified';
             sub.textContent = 'you are in';

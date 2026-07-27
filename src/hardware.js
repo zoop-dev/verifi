@@ -1,4 +1,4 @@
-import { w, d } from './env.js';
+import { w, d, _vIsMobile } from './env.js';
 import { _vP } from './storage.js';
 import { _vbayes } from './nn.js';
 import { _vsave } from './storage.js';
@@ -151,8 +151,14 @@ export function _vraf() {
       var mean = samples.reduce(function (a, b) { return a + b; }, 0) / samples.length;
       var stddev = Math.sqrt(samples.reduce(function (a, v) { return a + Math.pow(v - mean, 2); }, 0) / samples.length);
 
-      var s = stddev > 0.8 ? 90 : stddev > 0.4 ? 70 : stddev > 0.15 ? 35 : 5;
-      var c = 0.8;
+      var s, c;
+      if (_vIsMobile) {
+        s = stddev < 0.05 ? 5 : stddev < 0.15 ? 50 : stddev < 0.4 ? 75 : stddev < 0.8 ? 80 : 35;
+        c = 0.6;
+      } else {
+        s = stddev > 0.8 ? 90 : stddev > 0.4 ? 70 : stddev > 0.15 ? 35 : 5;
+        c = 0.8;
+      }
       _vP.sig.raf = { s: s, c: c, stddev: stddev };
       _vP.hp = _vbayes(_vP.hp, s / 100, c * 0.45);
       _vsave(); _vupdSc();
