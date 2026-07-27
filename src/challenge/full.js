@@ -157,7 +157,7 @@ export function runChallenge(onPass, onFail) {
 
   function showKeyholdChallenge() {
     title.textContent = 'almost there';
-    sub.textContent = 'press and hold enter or space for about a second and a half';
+    sub.textContent = 'press and hold enter or space, or press and hold the button below, for about a second and a half';
     shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="6" width="20" height="12" rx="2"/><line x1="6" y1="14" x2="18" y2="14"/></svg>';
     shield.style.borderColor = 'rgba(0,200,255,.2)';
     shield.style.background = 'rgba(0,200,255,.06)';
@@ -166,45 +166,66 @@ export function runChallenge(onPass, onFail) {
     targetsEl.style.display = 'none';
     var kbf = d.getElementById('_vf_kbfallback');
     if (kbf) kbf.remove();
-    status.textContent = 'waiting for key press…';
+    status.textContent = 'waiting…';
+
+    var holdBtn = d.createElement('button');
+    holdBtn.type = 'button';
+    holdBtn.id = '_vf_holdbtn';
+    holdBtn.textContent = 'press and hold';
+    holdBtn.setAttribute('aria-label', 'press and hold to verify you are human');
+    btn.parentNode.insertBefore(holdBtn, status);
 
     var TARGET_MIN = 900, TARGET_MAX = 2400;
     var holding = false, holdStart = 0;
 
-    function onKeyDown(e) {
-      if (e.repeat || (e.key !== 'Enter' && e.key !== ' ')) return;
-      e.preventDefault();
+    function cleanup() {
+      d.removeEventListener('keydown', onKeyDown);
+      d.removeEventListener('keyup', onKeyUp);
+      holdBtn.removeEventListener('pointerdown', onPointerDown);
+      holdBtn.removeEventListener('pointerup', onPointerUp);
+      holdBtn.removeEventListener('pointercancel', onPointerUp);
+    }
+
+    function beginHold() {
       if (holding) return;
       holding = true;
       holdStart = Date.now();
       bar.style.width = '30%';
       status.textContent = 'holding… keep holding';
     }
-    function onKeyUp(e) {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
+
+    function endHold() {
       if (!holding) return;
       holding = false;
       var dur = Date.now() - holdStart;
       if (dur >= TARGET_MIN && dur <= TARGET_MAX) {
-        d.removeEventListener('keydown', onKeyDown);
-        d.removeEventListener('keyup', onKeyUp);
+        cleanup();
+        if (holdBtn.parentNode) holdBtn.remove();
         setVerifying();
         setTimeout(setSuccess, 1200);
       } else {
         attempts2++;
         if (attempts2 >= 3) {
-          d.removeEventListener('keydown', onKeyDown);
-          d.removeEventListener('keyup', onKeyUp);
+          cleanup();
           escalate();
           return;
         }
         bar.style.width = '15%';
         status.textContent = dur < TARGET_MIN ? 'too short — try again' : 'too long — try again';
-        setTimeout(function () { status.textContent = 'waiting for key press…'; }, 1000);
+        setTimeout(function () { status.textContent = 'waiting…'; }, 1000);
       }
     }
+
+    function onKeyDown(e) { if (e.repeat || (e.key !== 'Enter' && e.key !== ' ')) return; e.preventDefault(); beginHold(); }
+    function onKeyUp(e) { if (e.key !== 'Enter' && e.key !== ' ') return; endHold(); }
+    function onPointerDown(e) { e.preventDefault(); beginHold(); }
+    function onPointerUp() { endHold(); }
+
     d.addEventListener('keydown', onKeyDown);
     d.addEventListener('keyup', onKeyUp);
+    holdBtn.addEventListener('pointerdown', onPointerDown);
+    holdBtn.addEventListener('pointerup', onPointerUp);
+    holdBtn.addEventListener('pointercancel', onPointerUp);
   }
 
   function showHardChallenge() {

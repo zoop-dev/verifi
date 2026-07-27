@@ -20,3 +20,7 @@
 #_vf_kbfallback{display:block;margin:14px auto 0;padding:4px 0;background:none;border:none;font:inherit;font-size:10px;color:#2d3748;cursor:pointer;text-decoration:underline;text-underline-offset:2px}
 #_vf_kbfallback:hover{color:#3d4f63}
 #_vf_kbfallback:focus-visible{outline:2px solid #00c8ff;outline-offset:2px}
+#_vf_holdbtn{display:block;width:100%;min-height:52px;padding:12px 16px;margin:4px 0 0;font:inherit;appearance:none;-webkit-appearance:none;border-radius:10px;border:1.5px solid rgba(0,200,255,.5);background:rgba(0,200,255,.05);cursor:pointer;font-size:13px;font-weight:600;color:#00c8ff;touch-action:none;user-select:none;-webkit-user-select:none;transition:background .15s,transform .12s}
+#_vf_holdbtn:hover{background:rgba(0,200,255,.1)}
+#_vf_holdbtn:active{transform:scale(.98);background:rgba(0,200,255,.14)}
+#_vf_holdbtn:focus-visible{outline:2px solid #00c8ff;outline-offset:2px}

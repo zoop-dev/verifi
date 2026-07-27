@@ -1,5 +1,15 @@
 var CHANGES = [
   {
+    version: '1.6.0',
+    date: '2026-07-27',
+    items: [
+      { tag: 'new', text: 'scoring now knows if youre on mobile and tunes thresholds accordingly instead of using desktop mouse-jitter math on a phone' },
+      { tag: 'new', text: 'touch drags now feed the same movement analysis mouse drags do, so mobile gets real signal back without bringing back the whole pressure/force-touch thing we ripped out' },
+      { tag: 'new', text: 'nn weights are now trained separately for mobile vs desktop instead of one blended average' },
+      { tag: 'fix', text: 'the keyboard-only fallback for the hard challenges only worked with a physical keyboard, so it was useless on mobile. added a press-and-hold button alongside it that works the same way via touch' }
+    ]
+  },
+  {
     version: '1.5.0',
     date: '2026-07-16',
     items: [
