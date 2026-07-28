@@ -1,5 +1,12 @@
 var CHANGES = [
   {
+    version: '1.7.0',
+    date: '2026-07-28',
+    items: [
+      { tag: 'new', text: 'drift detection — after a pass, verifi keeps watching the score in the background. if it drops hard and stays there (two checks, ~50s apart), it fires a verifi.on("drift", ...) event so you can decide what to do. nothing is auto-blocked, you get the data and choose.' }
+    ]
+  },
+  {
     version: '1.6.1',
     date: '2026-07-28',
     items: [

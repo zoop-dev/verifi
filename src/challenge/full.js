@@ -10,6 +10,7 @@ import { _vemit } from '../events.js';
 import { _behScore, _beh } from '../behavior.js';
 import { _vfetchToken } from '../network.js';
 import { _botCheckEnabled } from '../bot-heuristics.js';
+import { startDriftWatch } from '../drift.js';
 import challengeCss from '../styles/challenge-full.css?raw';
 
 export function runChallenge(onPass, onFail) {
@@ -99,7 +100,9 @@ export function runChallenge(onPass, onFail) {
     status.style.color = '#10b981';
     status.textContent = 'verified ✓';
     lsSet('_vf_v', '1');
-    state._verified = true; state._isBot = false; state._challengePassed = true; _vemit('pass', { probability: _vSc.p, confidence: _vSc.c });
+    state._verified = true; state._isBot = false; state._challengePassed = true;
+    _vemit('pass', { probability: _vSc.p, confidence: _vSc.c });
+    startDriftWatch(_vSc.p);
 
     (function () {
       try {

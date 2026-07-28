@@ -7,6 +7,7 @@ import { _vupdSc, _vSc } from './telemetry.js';
 import { _vP } from './storage.js';
 import { runMicroChallenge } from './challenge/micro.js';
 import { runChallenge } from './challenge/full.js';
+import { startDriftWatch } from './drift.js';
 import permBlockCss from './styles/perm-block.css?raw';
 
 (function () {
@@ -40,7 +41,7 @@ import permBlockCss from './styles/perm-block.css?raw';
     if (state._vIpFlags.indexOf('fast_challenge') >= 0) _clearBot = true;
     if (_clearBot) { runChallenge(_cb_pass, _cb_fail); return; }
 
-    if (_vSc.p >= 0.85 && _vP.ts > 0) { if (_cb_pass) _cb_pass(); return; }
+    if (_vSc.p >= 0.85 && _vP.ts > 0) { if (_cb_pass) _cb_pass(); startDriftWatch(_vSc.p); return; }
 
     var _graceDone = false;
     var _graceChecks = [
@@ -53,7 +54,7 @@ import permBlockCss from './styles/perm-block.css?raw';
         _vupdSc();
         var p = _vSc.p, c = _vSc.c, tier = _getTier();
 
-        if (p >= 0.85) { _graceDone = true; if (_cb_pass) _cb_pass(); return; }
+        if (p >= 0.85) { _graceDone = true; if (_cb_pass) _cb_pass(); startDriftWatch(p); return; }
 
         if (p < chk.threshold && c > chk.conf) {
           _graceDone = true;
@@ -64,7 +65,7 @@ import permBlockCss from './styles/perm-block.css?raw';
 
         if (i === _graceChecks.length - 1) {
           _graceDone = true;
-          if (tier === 0) { if (_cb_pass) _cb_pass(); }
+          if (tier === 0) { if (_cb_pass) _cb_pass(); startDriftWatch(p); }
           else if (tier === 2) { setTimeout(function () { runMicroChallenge(_cb_pass, _cb_fail); }, 200); }
           else if (state._isBot || tier >= 3) { runChallenge(_cb_pass, _cb_fail); }
         }
