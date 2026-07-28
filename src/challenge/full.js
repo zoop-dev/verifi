@@ -914,17 +914,32 @@ export function runChallenge(onPass, onFail) {
   }
 
   function permanentBlock() {
-    title.textContent = 'access blocked';
-    sub.textContent = 'close this tab and reopen to try again.';
+    btn.style.display = 'none';
+    targetsEl.style.display = 'none';
+    var kbf = d.getElementById('_vf_kbfallback');
+    if (kbf) kbf.style.display = 'none';
+    var hbtn = d.getElementById('_vf_holdbtn');
+    if (hbtn) hbtn.style.display = 'none';
+
+    var box = d.getElementById('_vf_box');
+    if (box) box.style.borderColor = 'rgba(239,68,68,.25)';
+
     shield.style.borderColor = 'rgba(239,68,68,.2)';
     shield.style.background = 'rgba(239,68,68,.06)';
     shield.style.color = '#ef4444';
     shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>';
+
+    title.textContent = 'access blocked';
+    title.style.color = '#ef4444';
+    sub.textContent = 'too many failed attempts. refresh the page to try again.';
+    sub.style.color = 'rgba(239,68,68,.55)';
+
     bar.style.width = '100%';
     bar.style.background = '#ef4444';
-    btn.style.display = 'none';
-    status.style.color = '#ef4444';
-    status.textContent = 'session blocked';
+
+    status.style.color = 'rgba(239,68,68,.45)';
+    status.textContent = 'this session has been flagged';
+
     try { sessionStorage.setItem('_vf_blocked', '1'); } catch (e) {}
     try { fetch(_POW_URL.replace('/pow-verify', '/ping'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ site_id: _SITE_ID, blocked: true }) }).catch(function () {}); } catch (e) {}
   }

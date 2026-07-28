@@ -1,5 +1,12 @@
 var CHANGES = [
   {
+    version: '1.6.1',
+    date: '2026-07-28',
+    items: [
+      { tag: 'fix', text: 'the blocked screen still showed the accessibility button and hold button — they\'re hidden now. also cleaned up the layout and made it actually look like a terminal state with red text instead of the same gray everything else uses' }
+    ]
+  },
+  {
     version: '1.6.0',
     date: '2026-07-27',
     items: [
