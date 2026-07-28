@@ -933,7 +933,7 @@ export function runChallenge(onPass, onFail) {
 
     title.textContent = 'access blocked';
     title.style.color = '#ef4444';
-    sub.textContent = 'too many failed attempts. refresh the page to try again.';
+    sub.textContent = 'too many failed attempts. open a new tab to try again.';
     sub.style.color = 'rgba(239,68,68,.55)';
 
     bar.style.width = '100%';
