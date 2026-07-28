@@ -921,6 +921,8 @@ export function runChallenge(onPass, onFail) {
     var hbtn = d.getElementById('_vf_holdbtn');
     if (hbtn) hbtn.style.display = 'none';
 
+    overlay.style.background = '#000';
+
     var box = d.getElementById('_vf_box');
     if (box) box.style.borderColor = 'rgba(239,68,68,.25)';
 
