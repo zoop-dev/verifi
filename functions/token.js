@@ -1,4 +1,5 @@
-import { getIpInfo, lookupIpReputation, recordIpHit } from './_ip.js';
+import { isDatacenter } from './_ip.js';
+import { lookupFingerprint, recordFingerprint, fingerprintPenalty } from './_fingerprint.js';
 import { verifyPow } from './_pow.js';
 import { lookupSite, originMatchesDomain } from './_sites.js';
 import { rateLimit } from './_ratelimit.js';
@@ -13,11 +14,11 @@ const CORS = {
 };
 
 function b64url(buf) {
-  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g,'-').replace(/\//g,'_').replace(/=/g,'');
+  return btoa(String.fromCharCode(...new Uint8Array(buf))).replace(/\+/g, '-').replace(/\//g, '_').replace(/=/g, '');
 }
 
 async function hmac(secret, data) {
-  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name:'HMAC', hash:'SHA-256' }, false, ['sign']);
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(secret), { name: 'HMAC', hash: 'SHA-256' }, false, ['sign']);
   return crypto.subtle.sign('HMAC', key, new TextEncoder().encode(data));
 }
 
@@ -34,7 +35,7 @@ export async function onRequestPost({ request, env }) {
       return new Response(JSON.stringify({ error: 'rate limited' }), { status: 429, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
 
-    const { site_id, pow, probability, confidence } = await request.json();
+    const { site_id, pow, probability, confidence, fingerprint_id } = await request.json();
 
     if (!pow?.challenge || pow.nonce === undefined || !pow.difficulty) {
       return new Response(JSON.stringify({ error: 'pow required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
@@ -57,21 +58,36 @@ export async function onRequestPost({ request, env }) {
       return new Response(JSON.stringify({ error: 'origin does not match registered domain' }), { status: 403, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
 
-    const ipInfo = await getIpInfo(request, env);
-    const ipRep = await lookupIpReputation(ipInfo.ip);
-    const serverPenalty = ipInfo.penalty + (ipRep.found && ipRep.score > 70 ? -0.15 : 0);
+    const dc = isDatacenter(request);
+    const fp = await lookupFingerprint(fingerprint_id, env);
+
+    let serverPenalty = dc ? -0.25 : 0;
+    serverPenalty += fingerprintPenalty(fp);
+
     const adjustedP = Math.max(0, Math.min(1, (probability || 0) + serverPenalty));
 
-    const rawFlags = [...new Set([...ipInfo.flags, ...(ipRep.flags || [])])];
+    const rawFlags = [...(dc ? ['datacenter'] : []), ...(fp?.flags || [])];
     const redeemed = adjustedP >= 0.6;
     const allFlags = redeemed ? rawFlags.filter(f => f !== 'failed_challenge') : rawFlags;
 
-    const passBot = Math.round((1 - adjustedP) * 100);
-    const blendedScore = Math.round((ipRep.score || 50) * 0.7 + passBot * 0.3);
-    await recordIpHit(ipInfo.ip, blendedScore, allFlags);
+    if (fingerprint_id) {
+      await recordFingerprint(fingerprint_id, {
+        pass: true,
+        flags: allFlags,
+      }, env);
+    }
 
     const now = Math.floor(Date.now() / 1000);
-    const payload = JSON.stringify({ site_id: site_id || '', domain: site.domain, iat: now, exp: now + TOKEN_TTL, p: Math.round(adjustedP * 1000) / 1000, c: Math.round((confidence || 0) * 1000) / 1000, flags: allFlags });
+    const payload = JSON.stringify({
+      site_id: site_id || '',
+      domain: site.domain,
+      iat: now,
+      exp: now + TOKEN_TTL,
+      p: Math.round(adjustedP * 1000) / 1000,
+      c: Math.round((confidence || 0) * 1000) / 1000,
+      flags: allFlags,
+      fp: fingerprint_id || null,
+    });
     const payloadB64 = b64url(new TextEncoder().encode(payload));
     const sigB64 = b64url(await hmac(SECRET, payloadB64));
     const token = `vrf1.${payloadB64}.${sigB64}`;

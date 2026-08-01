@@ -1,4 +1,5 @@
-import { hashIp, DC_ASNS, lookupIpReputation, recordIpHit } from './_ip.js';
+import { isDatacenter } from './_ip.js';
+import { lookupFingerprint, recordFingerprint } from './_fingerprint.js';
 import { bumpFail } from './_stats.js';
 
 const CORS = {
@@ -11,77 +12,29 @@ export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS });
 }
 
-export async function onRequestPost({ request, env, context }) {
-  const debug = [];
+export async function onRequestPost({ request, env }) {
   try {
     const body = await request.json().catch(() => ({}));
-    const rawIp = request.headers.get('cf-connecting-ip') || '';
-    if (!rawIp) {
-      return new Response(JSON.stringify({ bot_score: 50, flags: [], penalty: 0, error: 'missing cf-connecting-ip' }), {
-        status: 400, headers: { ...CORS, 'Content-Type': 'application/json' },
-      });
-    }
+    const dc = isDatacenter(request);
+    const flags = dc ? ['datacenter'] : [];
+    const penalty = dc ? -0.25 : 0;
 
-    const secret = env?.VERIFI_IP_SECRET;
-    if (!secret) throw new Error('VERIFI_IP_SECRET not set');
-    const ip = await hashIp(rawIp, secret);
-
-    debug.push(`hasIp=true`);
-
-    const asn = request.cf?.asn ? Number(request.cf.asn) : 0;
-    const isDatacenter = DC_ASNS.has(asn);
-
-    const flags = [];
-    if (isDatacenter) flags.push('datacenter');
-
-    const ipRep = ip ? await lookupIpReputation(ip) : { score: 50, flags: [], found: false };
-    const hasFailedBefore = (ipRep.flags || []).includes('failed_challenge');
-
-    const clientP = (body.p != null && body.p >= 0 && body.p <= 1) ? body.p : null;
-    const reportedBotScore = clientP != null ? Math.round((1 - clientP) * 100) : null;
-
-    let botScore;
-    if (reportedBotScore != null) {
-      botScore = ipRep.found
-        ? Math.round(ipRep.score * 0.7 + reportedBotScore * 0.3)
-        : reportedBotScore;
-    } else {
-      botScore = ipRep.found ? ipRep.score : 50;
-    }
-
-    if (isDatacenter) botScore = Math.min(100, botScore + 25);
-    if (hasFailedBefore) botScore = Math.min(100, botScore + 15);
-    botScore = Math.max(0, Math.min(100, botScore));
-
-    if (body.fail) botScore = Math.min(100, botScore + 20);
-
-    const allFlags = [...new Set([...flags, ...(ipRep.flags || [])])];
-    if (body.blocked && !allFlags.includes('failed_challenge')) allFlags.push('failed_challenge');
-    const finalPenalty = -((botScore - 50) / 200);
-
-    debug.push(`clientP=${clientP} reportedBot=${reportedBotScore} finalBot=${botScore} hasFailedBefore=${hasFailedBefore}`);
-
-    let upsertStatus = 0;
-    if (ip) {
-      upsertStatus = await recordIpHit(ip, botScore, allFlags);
-      debug.push(`upsert=${upsertStatus}`);
+    if (body.blocked && body.fingerprint_id) {
+      const fp = await lookupFingerprint(body.fingerprint_id, env);
+      const existing = fp?.flags || [];
+      const newFlags = existing.includes('failed_challenge') ? existing : [...existing, 'failed_challenge'];
+      await recordFingerprint(body.fingerprint_id, { fail: true, flags: newFlags }, env);
     }
 
     if (body.blocked && body.site_id) {
       await bumpFail(body.site_id);
     }
 
-    return new Response(JSON.stringify({
-      bot_score: botScore,
-      flags: allFlags,
-      penalty: Math.round(finalPenalty * 1000) / 1000,
-      cached: ipRep.found,
-      dc: isDatacenter,
-      debug,
-    }), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
-
+    return new Response(JSON.stringify({ flags, penalty, dc }), {
+      status: 200, headers: { ...CORS, 'Content-Type': 'application/json' },
+    });
   } catch (e) {
-    return new Response(JSON.stringify({ bot_score: 50, flags: [], penalty: 0, error: e.message, debug }), {
+    return new Response(JSON.stringify({ flags: [], penalty: 0, dc: false, error: e.message }), {
       status: 200, headers: { ...CORS, 'Content-Type': 'application/json' },
     });
   }

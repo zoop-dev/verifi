@@ -1,4 +1,8 @@
 import { state } from './state.js';
+import { _vP } from './storage.js';
+import { _vsave } from './storage.js';
+import { _vupdSc } from './telemetry.js';
+import { _POW_URL, _SITE_ID } from './site-config.js';
 
 var _FP_KEY = 'identifi-history';
 
@@ -102,6 +106,25 @@ export function initFingerprint() {
         } catch (e) {}
         state._resilientId = resilientId;
         state._fpVisitCount = visitCount;
+
+        try {
+          fetch(_POW_URL.replace('/pow-verify', '/api/fp-check'), {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ fingerprint_id: resilientId }),
+          }).then(function (r) { return r.json(); }).then(function (data) {
+            if (data.penalty) {
+              _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + data.penalty));
+              _vsave(); _vupdSc();
+            }
+            if (data.flags && data.flags.length) {
+              state._vIpFlags = [...new Set([...state._vIpFlags, ...data.flags])];
+            }
+            if (data.fast_challenge) {
+              state._vIpFlags = [...new Set([...state._vIpFlags, 'fast_challenge'])];
+            }
+          }).catch(function () {});
+        } catch (e) {}
       });
     }).catch(function () {});
   } catch (e) {}

@@ -947,7 +947,7 @@ export function runChallenge(onPass, onFail) {
     status.textContent = 'this session has been flagged';
 
     try { sessionStorage.setItem('_vf_blocked', '1'); } catch (e) {}
-    try { fetch(_POW_URL.replace('/pow-verify', '/ping'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ site_id: _SITE_ID, blocked: true }) }).catch(function () {}); } catch (e) {}
+    try { var _bp = { site_id: _SITE_ID, blocked: true }; if (state._resilientId) _bp.fingerprint_id = state._resilientId; fetch(_POW_URL.replace('/pow-verify', '/ping'), { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(_bp) }).catch(function () {}); } catch (e) {}
   }
 
   btn.addEventListener('click', function () {

@@ -14,13 +14,12 @@ import { _POW_URL, _SITE_ID } from './site-config.js';
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ site_id: _SITE_ID, p: _vSc && _vSc.p != null ? _vSc.p : null }),
     }).then(function (r) { return r.json(); }).then(function (data) {
-      state._vIpPenalty = data.penalty || 0;
-      state._vIpFlags = data.flags || [];
-      if (state._vIpPenalty !== 0) {
-        _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + state._vIpPenalty));
+      if (data.penalty) {
+        _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + data.penalty));
         _vsave(); _vupdSc();
       }
-      if (data.dc || data.bot_score > 75) { state._vIpFlags.push('fast_challenge'); }
+      if (data.flags && data.flags.length) state._vIpFlags = data.flags;
+      if (data.dc) state._vIpFlags = [...new Set([...state._vIpFlags, 'fast_challenge'])];
     }).catch(function () {});
   } catch (e) {}
 })();
