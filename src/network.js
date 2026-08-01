@@ -44,6 +44,7 @@ export function _vfetchToken() {
   function doFetch() {
     if (!state._powResult) { setTimeout(doFetch, 500); return; }
     var payload = { site_id: _SITE_ID, pow: state._powResult, probability: _vSc.p, confidence: _vSc.c };
+    if (state._resilientId) payload.fingerprint_id = state._resilientId;
     fetch(_POW_URL.replace('/pow-verify', '/token'), {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },

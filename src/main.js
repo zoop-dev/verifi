@@ -1,4 +1,5 @@
 import { state } from './state.js';
+import { initFingerprint } from './fingerprint-id.js';
 import { _SITE_ID } from './site-config.js';
 import { _vload, _vP } from './storage.js';
 import { _vupdSc, _vanalyze } from './telemetry.js';
@@ -13,6 +14,8 @@ import './network.js';
 import './gate.js';
 import './autoinit.js';
 import './public-api.js';
+
+initFingerprint();
 
 _vload().then(function () {
   _vupdSc();
