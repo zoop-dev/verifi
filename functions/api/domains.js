@@ -56,7 +56,7 @@ export async function onRequestPost({ request, env }) {
         'Content-Type': 'application/json',
         Prefer: 'return=minimal',
       },
-      body: JSON.stringify({ domains: updated, domain: updated[0] }),
+      body: JSON.stringify({ domains: updated }),
     });
 
     return new Response(JSON.stringify({ domains: updated }), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });

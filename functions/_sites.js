@@ -5,7 +5,7 @@ export async function lookupSite(id, withKey = false, env = null) {
   try {
     const key = withKey ? env?.SUPABASE_SERVICE_KEY : SB_KEY;
     if (withKey && !key) throw new Error('SUPABASE_SERVICE_KEY not set');
-    const select = withKey ? 'id,domain,domains,name,admin_key,created_at' : 'id,domain,domains,name,created_at';
+    const select = withKey ? 'id,domains,name,admin_key,created_at' : 'id,domains,name,created_at';
     const r = await fetch(`${SB_URL}/rest/v1/verifi_sites?id=eq.${encodeURIComponent(id)}&select=${select}`, {
       headers: { apikey: key, Authorization: `Bearer ${key}` }
     });
@@ -23,7 +23,7 @@ export async function verifySiteKey(id, key, env) {
 
 export async function listSites() {
   try {
-    const r = await fetch(`${SB_URL}/rest/v1/verifi_sites?select=id,name,domain,created_at&order=created_at.desc&limit=200`, {
+    const r = await fetch(`${SB_URL}/rest/v1/verifi_sites?select=id,name,domains,created_at&order=created_at.desc&limit=200`, {
       headers: { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` }
     });
     const rows = await r.json();
@@ -34,9 +34,7 @@ export async function listSites() {
 }
 
 export function getSiteDomains(site) {
-  if (site?.domains?.length) return site.domains;
-  if (site?.domain) return [site.domain];
-  return [];
+  return site?.domains?.length ? site.domains : [];
 }
 
 export function normalizeDomain(input) {

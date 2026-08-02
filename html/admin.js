@@ -39,7 +39,7 @@ async function loadSites() {
       var card = document.createElement('div');
       card.className = 'sites__card';
       card.innerHTML = '<div class="site-name">' + escapeHtml(site.name) + '</div>' +
-        '<div class="site-domain">' + escapeHtml(site.domain || '') + '</div>' +
+        '<div class="site-domain">' + escapeHtml((site.domains || []).join(', ')) + '</div>' +
         '<div class="site-id">' + escapeHtml(site.id) + '</div>' +
         '<div class="site-arrow">→</div>';
       card.addEventListener('click', function () {
