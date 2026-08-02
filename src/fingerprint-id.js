@@ -3,6 +3,7 @@ import { _vP } from './storage.js';
 import { _vsave } from './storage.js';
 import { _vSc, _vupdSc } from './telemetry.js';
 import { _POW_URL, _SITE_ID } from './site-config.js';
+import { _vtoast } from './toast.js';
 
 var _FP_KEY = 'identifi-history';
 
@@ -114,7 +115,14 @@ export function initFingerprint() {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify({ site_id: _SITE_ID, fingerprint_id: resilientId, p: _vSc && _vSc.p != null ? _vSc.p : null, headless: headless || undefined }),
-          }).then(function (r) { return r.json(); }).then(function (data) {
+          }).then(function (r) {
+            if (r.status === 403) {
+              state._vfSiteInvalid = true;
+              _vtoast('⚠', "verifi wasn't configured for this domain, nothing will be pushed to the cloud", { header: 'Invalid Domain', duration: 8000 });
+              return {};
+            }
+            return r.json();
+          }).then(function (data) {
             if (data.penalty) {
               _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + data.penalty));
               _vsave(); _vupdSc();

@@ -12,6 +12,7 @@ export const state = {
   _powDone: false,
   _resilientId: null,
   _fpVisitCount: 0,
+  _vfSiteInvalid: false,
   _vToken: null,
   _vTokenExp: 0,
   _vLastActivity: Date.now(),

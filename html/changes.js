@@ -1,5 +1,15 @@
 var CHANGES = [
   {
+    version: '1.8.1',
+    date: '2026-08-01',
+    items: [
+      { tag: 'new', text: 'toast notifications — small top-left popups matching the verifi theme, icon in a circle on the left with a header and body text' },
+      { tag: 'new', text: 'if the site id doesn\'t match the request domain, ping now returns a 403 and a toast fires explaining the misconfiguration. nothing gets pushed to supabase in that state.' },
+      { tag: 'fix', text: 'ping now validates the site id against the request origin the same way the token endpoint does — previously any domain could send pings against any site id' },
+      { tag: 'fix', text: 'new devices now get a row in verifi_fingerprints on their first ping instead of waiting for a challenge or block event' },
+    ]
+  },
+  {
     version: '1.8.0',
     date: '2026-08-01',
     items: [

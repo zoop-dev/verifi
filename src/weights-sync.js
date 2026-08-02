@@ -2,6 +2,7 @@ import { _VNN } from './nn.js';
 import { _vP } from './storage.js';
 import { _vsave } from './storage.js';
 import { _vIsMobile } from './env.js';
+import { state } from './state.js';
 
 var _SB_URL = 'https://ymfgcndmekugcwiivrof.supabase.co';
 var _SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InltZmdjbmRtZWt1Z2N3aWl2cm9mIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzgzODMwNTksImV4cCI6MjA5Mzk1OTA1OX0.sMR3ooeVVvEuW_R1GwcrNscLr94iFrF_GK614rME-m4';
@@ -44,7 +45,7 @@ export function _vfetchWeights() {
 }
 
 export function _vpushWeights(label) {
-  if (_vP.ts < 0) return;
+  if (_vP.ts < 0 || state._vfSiteInvalid) return;
   try {
     fetch(_SB_URL + '/rest/v1/verifi_weights', {
       method: 'POST',
