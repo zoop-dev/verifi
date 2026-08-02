@@ -2,7 +2,7 @@ import { isDatacenter } from './_ip.js';
 import { lookupFingerprint, recordFingerprint, fingerprintPenalty } from './_fingerprint.js';
 import { verifyPow } from './_pow.js';
 import { lookupSite, originMatchesDomain } from './_sites.js';
-import { rateLimit } from './_ratelimit.js';
+import { rateLimit, rateLimitByFingerprint } from './_ratelimit.js';
 import { bumpPass } from './_stats.js';
 
 const TOKEN_TTL = 300;
@@ -36,6 +36,11 @@ export async function onRequestPost({ request, env }) {
     }
 
     const { site_id, pow, probability, confidence, fingerprint_id } = await request.json();
+
+    const rlFp = await rateLimitByFingerprint(fingerprint_id, env, { scope: 'token', limit: 15, windowSeconds: 300 });
+    if (rlFp.limited) {
+      return new Response(JSON.stringify({ error: 'rate limited' }), { status: 429, headers: { ...CORS, 'Content-Type': 'application/json' } });
+    }
 
     if (!pow?.challenge || pow.nonce === undefined || !pow.difficulty) {
       return new Response(JSON.stringify({ error: 'pow required' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });

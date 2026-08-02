@@ -23,3 +23,20 @@ export async function rateLimit(request, env, opts) {
   await kv.put(key, String(count + 1), { expirationTtl: opts.windowSeconds * 2 });
   return { limited: false };
 }
+
+export async function rateLimitByFingerprint(fingerprint_id, env, opts) {
+  if (!fingerprint_id) return { limited: false };
+  const kv = env?.RATE_LIMIT;
+  if (!kv) return { limited: false };
+
+  const now = Math.floor(Date.now() / 1000);
+  const bucket = Math.floor(now / opts.windowSeconds);
+  const key = `rl:fp:${opts.scope}:${fingerprint_id}:${bucket}`;
+
+  const current = await kv.get(key);
+  const count = current ? parseInt(current, 10) : 0;
+  if (count >= opts.limit) return { limited: true };
+
+  await kv.put(key, String(count + 1), { expirationTtl: opts.windowSeconds * 2 });
+  return { limited: false };
+}

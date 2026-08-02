@@ -108,10 +108,10 @@ export function initFingerprint() {
         state._fpVisitCount = visitCount;
 
         try {
-          fetch(_POW_URL.replace('/pow-verify', '/api/fp-check'), {
+          fetch(_POW_URL.replace('/pow-verify', '/ping'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ fingerprint_id: resilientId }),
+            body: JSON.stringify({ site_id: _SITE_ID, fingerprint_id: resilientId }),
           }).then(function (r) { return r.json(); }).then(function (data) {
             if (data.penalty) {
               _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + data.penalty));
