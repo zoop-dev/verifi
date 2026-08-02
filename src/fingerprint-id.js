@@ -1,7 +1,7 @@
 import { state } from './state.js';
 import { _vP } from './storage.js';
 import { _vsave } from './storage.js';
-import { _vupdSc } from './telemetry.js';
+import { _vSc, _vupdSc } from './telemetry.js';
 import { _POW_URL, _SITE_ID } from './site-config.js';
 
 var _FP_KEY = 'identifi-history';
@@ -107,11 +107,13 @@ export function initFingerprint() {
         state._resilientId = resilientId;
         state._fpVisitCount = visitCount;
 
+        var headless = navigator.webdriver === true;
+
         try {
           fetch(_POW_URL.replace('/pow-verify', '/ping'), {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ site_id: _SITE_ID, fingerprint_id: resilientId }),
+            body: JSON.stringify({ site_id: _SITE_ID, fingerprint_id: resilientId, p: _vSc && _vSc.p != null ? _vSc.p : null, headless: headless || undefined }),
           }).then(function (r) { return r.json(); }).then(function (data) {
             if (data.penalty) {
               _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + data.penalty));
@@ -120,9 +122,8 @@ export function initFingerprint() {
             if (data.flags && data.flags.length) {
               state._vIpFlags = [...new Set([...state._vIpFlags, ...data.flags])];
             }
-            if (data.fast_challenge) {
-              state._vIpFlags = [...new Set([...state._vIpFlags, 'fast_challenge'])];
-            }
+            if (data.dc) state._vIpFlags = [...new Set([...state._vIpFlags, 'fast_challenge'])];
+            if (data.fast_challenge) state._vIpFlags = [...new Set([...state._vIpFlags, 'fast_challenge'])];
           }).catch(function () {});
         } catch (e) {}
       });

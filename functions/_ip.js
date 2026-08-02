@@ -3,6 +3,19 @@ export const DC_ASNS = new Set([
   24940, 16276, 51167, 60781, 36352, 7922, 40676, 174, 3356,
 ]);
 
+export const VPN_ASNS = new Set([
+  39351,  // Mullvad
+  209103, // ProtonVPN
+  62597,  // ProtonVPN
+  197540, // NordVPN
+  212238, // NordVPN
+  267784, // Surfshark
+  136061, // ExpressVPN
+  138915, // ExpressVPN
+  40021,  // TorGuard
+  204953, // IVPN
+]);
+
 export async function hashIp(ip, secret) {
   const key = await crypto.subtle.importKey(
     'raw', new TextEncoder().encode(secret),
@@ -15,4 +28,9 @@ export async function hashIp(ip, secret) {
 export function isDatacenter(request) {
   const asn = request.cf?.asn ? Number(request.cf.asn) : 0;
   return DC_ASNS.has(asn);
+}
+
+export function isVpn(request) {
+  const asn = request.cf?.asn ? Number(request.cf.asn) : 0;
+  return VPN_ASNS.has(asn);
 }

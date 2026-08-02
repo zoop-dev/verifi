@@ -1,28 +1,9 @@
 import { d } from './env.js';
 import { state } from './state.js';
-import { _vP } from './storage.js';
-import { _vsave } from './storage.js';
 import { _vSc, _vupdSc } from './telemetry.js';
 import { _vCfg } from './config.js';
 import { _vemit } from './events.js';
 import { _POW_URL, _SITE_ID } from './site-config.js';
-
-(function () {
-  try {
-    fetch(_POW_URL.replace('/pow-verify', '/ping'), {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ site_id: _SITE_ID, p: _vSc && _vSc.p != null ? _vSc.p : null }),
-    }).then(function (r) { return r.json(); }).then(function (data) {
-      if (data.penalty) {
-        _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + data.penalty));
-        _vsave(); _vupdSc();
-      }
-      if (data.flags && data.flags.length) state._vIpFlags = data.flags;
-      if (data.dc) state._vIpFlags = [...new Set([...state._vIpFlags, 'fast_challenge'])];
-    }).catch(function () {});
-  } catch (e) {}
-})();
 
 (function () {
   var act = function () { state._vLastActivity = Date.now(); };

@@ -1,5 +1,5 @@
-import { isDatacenter } from './_ip.js';
-import { lookupFingerprint, recordFingerprint, fingerprintPenalty } from './_fingerprint.js';
+import { isDatacenter, isVpn } from './_ip.js';
+import { lookupFingerprint, recordFingerprint, fingerprintPenalty, isBanned } from './_fingerprint.js';
 import { verifyPow } from './_pow.js';
 import { lookupSite, originMatchesDomain } from './_sites.js';
 import { rateLimit, rateLimitByFingerprint } from './_ratelimit.js';
@@ -64,14 +64,19 @@ export async function onRequestPost({ request, env }) {
     }
 
     const dc = isDatacenter(request);
+    const vpn = isVpn(request);
     const fp = await lookupFingerprint(fingerprint_id, env);
 
-    let serverPenalty = dc ? -0.25 : 0;
+    if (isBanned(fp)) {
+      return new Response(JSON.stringify({ error: 'banned' }), { status: 403, headers: { ...CORS, 'Content-Type': 'application/json' } });
+    }
+
+    let serverPenalty = (dc ? -0.25 : 0) + (vpn ? -0.10 : 0);
     serverPenalty += fingerprintPenalty(fp);
 
     const adjustedP = Math.max(0, Math.min(1, (probability || 0) + serverPenalty));
 
-    const rawFlags = [...(dc ? ['datacenter'] : []), ...(fp?.flags || [])];
+    const rawFlags = [...(dc ? ['datacenter'] : []), ...(vpn ? ['vpn'] : []), ...(fp?.flags || [])];
     const redeemed = adjustedP >= 0.6;
     const allFlags = redeemed ? rawFlags.filter(f => f !== 'failed_challenge') : rawFlags;
 

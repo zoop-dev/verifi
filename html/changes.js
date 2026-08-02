@@ -1,5 +1,12 @@
 var CHANGES = [
   {
+    version: '1.8.0',
+    date: '2026-08-01',
+    items: [
+      { tag: 'new', text: 'device fingerprinting now tracks four additional reputation flags. headless catches navigator.webdriver bots outright (−0.35 hit, auto fast-challenge). vpn detects known vpn provider asns the same way datacenter detection works (−0.10). trusted is earned automatically after 15 clean passes — it cuts friction for real repeat visitors (+0.15). banned is a hard block you set manually in supabase: no token issued, ever.' },
+    ]
+  },
+  {
     version: '1.7.0',
     date: '2026-07-28',
     items: [
