@@ -40,17 +40,19 @@ export async function onRequestPost({ request, env }) {
           flags.push(...(fp.flags || []));
           penalty += fingerprintPenalty(fp);
           fast_challenge = fp.fail_count > 3 && fp.pass_count === 0;
-        }
-        if (body.headless) {
-          if (!flags.includes('headless')) flags.push('headless');
-          penalty -= 0.35;
-          fast_challenge = true;
-          if (body.fingerprint_id) {
-            const fp2 = await lookupFingerprint(body.fingerprint_id, env);
-            const existing2 = fp2?.flags || [];
-            if (!existing2.includes('headless')) {
-              await recordFingerprint(body.fingerprint_id, { flags: [...existing2, 'headless'] }, env);
-            }
+          if (body.headless && !fp.flags?.includes('headless')) {
+            if (!flags.includes('headless')) flags.push('headless');
+            penalty -= 0.35;
+            fast_challenge = true;
+            await recordFingerprint(body.fingerprint_id, { flags: [...(fp.flags || []), 'headless'] }, env);
+          }
+        } else {
+          const initFlags = body.headless ? ['headless'] : [];
+          await recordFingerprint(body.fingerprint_id, { flags: initFlags }, env);
+          if (body.headless) {
+            if (!flags.includes('headless')) flags.push('headless');
+            penalty -= 0.35;
+            fast_challenge = true;
           }
         }
       }
