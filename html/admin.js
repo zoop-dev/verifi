@@ -103,7 +103,8 @@ function renderDashboard(data, siteId, siteKey) {
   var dashboard = document.getElementById('dashboard');
   var site = data.site || {};
   document.getElementById('site-name').textContent = site.name || siteId;
-  document.getElementById('site-domain').textContent = site.domain || '';
+  renderDomains(site.domains || [], siteId, siteKey);
+  document.getElementById('site-domain').textContent = (site.domains || []).join(', ') || '';
 
   var totals = data.totals || { passes: 0, fails: 0 };
   var total = totals.passes + totals.fails;
@@ -124,6 +125,53 @@ function renderDashboard(data, siteId, siteKey) {
     drawTrendChart(days);
     drawSplitChart(totals.passes, totals.fails);
   });
+}
+
+function renderDomains(domains, siteId, siteKey) {
+  var el = document.getElementById('domains-section');
+  if (!el) return;
+  var canEdit = !!(siteKey || GLOBAL_KEY);
+  var pills = domains.map(function (d) {
+    var removeBtn = (canEdit && domains.length > 1)
+      ? '<button onclick="removeDomain(\'' + escapeHtml(d) + '\')" title="remove" style="margin-left:6px;background:none;border:none;color:var(--muted);cursor:pointer;font-size:11px;padding:0;line-height:1">×</button>'
+      : '';
+    return '<span class="domain-pill">' + escapeHtml(d) + removeBtn + '</span>';
+  }).join('');
+  var addForm = canEdit
+    ? '<div class="domain-add"><input id="domain-inp" placeholder="add domain…" style="flex:1;min-width:0;padding:6px 10px;border-radius:var(--r);border:1px solid var(--bd);background:var(--sf2);color:var(--text);font-family:inherit;font-size:12px;outline:none" /><button class="btn secondary" onclick="addDomain()" style="white-space:nowrap">add</button></div>'
+    : '';
+  el.innerHTML = '<div class="domains-label">domains</div><div class="domain-pills">' + pills + '</div>' + addForm;
+}
+
+async function addDomain() {
+  var inp = document.getElementById('domain-inp');
+  var domain = inp ? inp.value.trim() : '';
+  if (!domain) return;
+  await mutateDomain('add', domain);
+}
+
+async function removeDomain(domain) {
+  await mutateDomain('remove', domain);
+}
+
+async function mutateDomain(action, domain) {
+  var siteId = SITE_ID || document.getElementById('site-inp').value.trim();
+  var siteKey = SITE_KEY || document.getElementById('key-inp').value.trim() || GLOBAL_KEY;
+  try {
+    var res = await fetch('/api/domains', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ site_id: siteId, admin_key: siteKey, action: action, domain: domain }),
+    });
+    var data = await res.json();
+    if (data.error) { alert(data.error); return; }
+    renderDomains(data.domains, siteId, siteKey);
+    document.getElementById('site-domain').textContent = data.domains.join(', ');
+    var inp = document.getElementById('domain-inp');
+    if (inp) inp.value = '';
+  } catch (e) {
+    alert('error: ' + e.message);
+  }
 }
 
 function formatNumber(n) {

@@ -55,6 +55,7 @@ export async function onRequestPost({ request, env }) {
         admin_key: key,
         name: name.trim().slice(0, 100),
         domain: normalizedDomain,
+        domains: [normalizedDomain],
         created_at: new Date().toISOString(),
       }),
     });

@@ -1,5 +1,12 @@
 var CHANGES = [
   {
+    version: '1.8.2',
+    date: '2026-08-02',
+    items: [
+      { tag: 'new', text: 'sites can now have multiple domains. add or remove them from the admin dashboard. all origin checks (ping and token) validate against the full list.' },
+    ]
+  },
+  {
     version: '1.8.1',
     date: '2026-08-01',
     items: [

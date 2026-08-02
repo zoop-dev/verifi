@@ -1,7 +1,7 @@
 import { isDatacenter, isVpn } from './_ip.js';
 import { lookupFingerprint, recordFingerprint, fingerprintPenalty, isBanned } from './_fingerprint.js';
 import { verifyPow } from './_pow.js';
-import { lookupSite, originMatchesDomain } from './_sites.js';
+import { lookupSite, originMatchesDomain, getSiteDomains } from './_sites.js';
 import { rateLimit, rateLimitByFingerprint } from './_ratelimit.js';
 import { bumpPass } from './_stats.js';
 
@@ -55,11 +55,12 @@ export async function onRequestPost({ request, env }) {
     }
 
     const site = await lookupSite(site_id);
-    if (!site || !site.domain) {
+    const siteDomains = getSiteDomains(site);
+    if (!site || !siteDomains.length) {
       return new Response(JSON.stringify({ error: 'unknown or unregistered site_id' }), { status: 400, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
     const origin = request.headers.get('origin');
-    if (!originMatchesDomain(origin, site.domain)) {
+    if (!originMatchesDomain(origin, siteDomains)) {
       return new Response(JSON.stringify({ error: 'origin does not match registered domain' }), { status: 403, headers: { ...CORS, 'Content-Type': 'application/json' } });
     }
 
@@ -90,7 +91,7 @@ export async function onRequestPost({ request, env }) {
     const now = Math.floor(Date.now() / 1000);
     const payload = JSON.stringify({
       site_id: site_id || '',
-      domain: site.domain,
+      domain: siteDomains[0],
       iat: now,
       exp: now + TOKEN_TTL,
       p: Math.round(adjustedP * 1000) / 1000,

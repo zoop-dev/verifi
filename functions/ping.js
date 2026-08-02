@@ -2,7 +2,7 @@ import { isDatacenter, isVpn } from './_ip.js';
 import { lookupFingerprint, recordFingerprint, fingerprintPenalty, isBanned } from './_fingerprint.js';
 import { rateLimitByFingerprint } from './_ratelimit.js';
 import { bumpFail } from './_stats.js';
-import { lookupSite, originMatchesDomain } from './_sites.js';
+import { lookupSite, originMatchesDomain, getSiteDomains } from './_sites.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -20,7 +20,7 @@ export async function onRequestPost({ request, env }) {
     if (body.site_id) {
       const site = await lookupSite(body.site_id);
       const origin = request.headers.get('origin');
-      if (!site || !originMatchesDomain(origin, site.domain)) {
+      if (!site || !originMatchesDomain(origin, getSiteDomains(site))) {
         return new Response(JSON.stringify({ error: 'origin does not match registered domain' }), {
           status: 403, headers: { ...CORS, 'Content-Type': 'application/json' },
         });

@@ -1,6 +1,6 @@
 import { getStats } from './_stats.js';
 import { rateLimit } from './_ratelimit.js';
-import { listSites, lookupSite, verifySiteKey } from './_sites.js';
+import { listSites, lookupSite, verifySiteKey, getSiteDomains } from './_sites.js';
 
 const CORS = {
   'Access-Control-Allow-Origin': '*',
@@ -54,7 +54,7 @@ export async function onRequestGet({ request, env }) {
 
   const site = await lookupSite(siteId);
   if (site) {
-    stats.site = { id: site.id, name: site.name, domain: site.domain, created_at: site.created_at };
+    stats.site = { id: site.id, name: site.name, domains: getSiteDomains(site), created_at: site.created_at };
   }
 
   return new Response(JSON.stringify(stats), { status: 200, headers: { ...CORS, 'Content-Type': 'application/json' } });
