@@ -237,14 +237,8 @@ export function runChallenge(onPass, onFail) {
 
   function showHardChallenge() {
     stage = 1;
-    var types = ['image', 'draw', 'slider', 'dots', 'dial', 'trace'];
-    var pick = types[Math.floor(Math.random() * types.length)];
-    if (pick === 'image') showImageChallenge();
-    else if (pick === 'slider') showSliderChallenge();
-    else if (pick === 'dots') showDotsChallenge();
-    else if (pick === 'dial') showDialChallenge();
-    else if (pick === 'trace') showTraceChallenge();
-    else showDrawChallenge();
+    if (Math.random() < 0.5) showImageChallenge();
+    else showWordChallenge();
   }
 
 

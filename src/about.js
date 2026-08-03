@@ -11,7 +11,7 @@ export function _vshowAbout() {
   if (d.getElementById('_vAbout')) return;
   var o = d.createElement('div');
   o.id = '_vAbout';
-  o.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;pointer-events:auto';
+  o.style.cssText = 'position:fixed;inset:0;z-index:2147483647;background:rgba(0,0,0,.6);display:flex;align-items:center;justify-content:center;padding:20px;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;pointer-events:auto;cursor:auto';
 
   var items = _vAboutPrivacy.map(function (row) {
     return '<li style="display:flex;align-items:center;gap:10px;font-size:11px;color:#4a6070;line-height:1.5">' +
