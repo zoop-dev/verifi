@@ -27,6 +27,8 @@ export function runChallenge(onPass, onFail) {
   } catch (e) {}
 
   _vlock();
+  var _vOrigTitle = d.title;
+  d.title = '⚠️ verifying…';
   var overlay = d.createElement('div');
   overlay.id = '_vf_ch';
   overlay.setAttribute('role', 'dialog');
@@ -135,6 +137,7 @@ export function runChallenge(onPass, onFail) {
         if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
         styleEl.remove();
         d.removeEventListener('mousemove', mouseMoveHandler);
+        d.title = _vOrigTitle;
         onPass && onPass();
       }, 250);
     }, 900);
@@ -234,9 +237,10 @@ export function runChallenge(onPass, onFail) {
 
   function showHardChallenge() {
     stage = 1;
-    var types = ['draw', 'slider', 'dots', 'dial', 'trace'];
+    var types = ['image', 'draw', 'slider', 'dots', 'dial', 'trace'];
     var pick = types[Math.floor(Math.random() * types.length)];
-    if (pick === 'slider') showSliderChallenge();
+    if (pick === 'image') showImageChallenge();
+    else if (pick === 'slider') showSliderChallenge();
     else if (pick === 'dots') showDotsChallenge();
     else if (pick === 'dial') showDialChallenge();
     else if (pick === 'trace') showTraceChallenge();
@@ -778,6 +782,142 @@ export function runChallenge(onPass, onFail) {
     d.addEventListener('touchend', onEnd);
   }
 
+  function showImageChallenge() {
+    title.textContent = 'almost there';
+    sub.textContent = 'loading challenge…';
+    shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>';
+    shield.style.borderColor = 'rgba(0,200,255,.2)';
+    shield.style.background = 'rgba(0,200,255,.06)';
+    shield.style.color = '#00c8ff';
+    btn.style.display = 'none';
+    targetsEl.style.display = 'block';
+    targetsEl.innerHTML = '';
+    status.textContent = '';
+
+    var _token = null, _selected = [], _imgFailed = false;
+    var CELL_PX = 90, COLS = 3, ROWS = 3, GAP = 2;
+    var GRID_PX = CELL_PX * COLS + GAP * (COLS - 1);
+
+    var wrap = d.createElement('div');
+    wrap.style.cssText = 'display:flex;flex-direction:column;align-items:center;gap:10px';
+
+    var gridEl = d.createElement('div');
+    gridEl.style.cssText = 'display:grid;grid-template-columns:repeat(' + COLS + ',' + CELL_PX + 'px);grid-template-rows:repeat(' + ROWS + ',' + CELL_PX + 'px);gap:' + GAP + 'px;border-radius:8px;overflow:hidden;cursor:pointer';
+
+    var cells = [];
+    for (var ci = 0; ci < COLS * ROWS; ci++) {
+      (function (idx) {
+        var cell = d.createElement('div');
+        cell.style.cssText = 'position:relative;width:' + CELL_PX + 'px;height:' + CELL_PX + 'px;background:#111820;overflow:hidden;user-select:none;-webkit-user-select:none';
+
+        var img = d.createElement('div');
+        img.style.cssText = 'position:absolute;inset:0;background-size:' + (COLS * 100) + '% ' + (ROWS * 100) + '%;background-repeat:no-repeat;transition:opacity .15s';
+        img.style.backgroundPositionX = '-' + ((idx % COLS) * CELL_PX) + 'px';
+        img.style.backgroundPositionY = '-' + (Math.floor(idx / COLS) * CELL_PX) + 'px';
+
+        var sel = d.createElement('div');
+        sel.style.cssText = 'position:absolute;inset:0;background:rgba(0,200,255,.22);border:2px solid #00c8ff;opacity:0;transition:opacity .12s;pointer-events:none';
+
+        var check = d.createElement('div');
+        check.style.cssText = 'position:absolute;bottom:4px;right:4px;width:16px;height:16px;border-radius:50%;background:#00c8ff;display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .12s;pointer-events:none';
+        check.innerHTML = '<svg width="9" height="9" viewBox="0 0 9 9" fill="none"><polyline points="1.5,4.5 3.5,6.5 7.5,2.5" stroke="#070a0e" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+
+        cell.appendChild(img); cell.appendChild(sel); cell.appendChild(check);
+        cells.push({ el: cell, img: img, sel: sel, check: check });
+        gridEl.appendChild(cell);
+
+        cell.addEventListener('click', function () {
+          if (!_token) return;
+          var i = _selected.indexOf(idx);
+          if (i >= 0) {
+            _selected.splice(i, 1);
+            sel.style.opacity = '0'; check.style.opacity = '0';
+          } else {
+            _selected.push(idx);
+            sel.style.opacity = '1'; check.style.opacity = '1';
+          }
+        });
+      })(ci);
+    }
+
+    var submitBtn = d.createElement('button');
+    submitBtn.textContent = 'verify';
+    submitBtn.style.cssText = 'width:100%;max-width:' + GRID_PX + 'px;padding:9px;border-radius:6px;border:1px solid rgba(0,200,255,.25);background:rgba(0,200,255,.08);color:#00c8ff;font-weight:700;cursor:pointer;font-size:13px;font-family:inherit;opacity:.5;pointer-events:none';
+
+    var hint = d.createElement('div');
+    hint.style.cssText = 'font-size:10px;color:#3d4f63;text-align:center';
+    hint.textContent = 'click each matching square, then verify';
+
+    wrap.appendChild(gridEl); wrap.appendChild(submitBtn); wrap.appendChild(hint);
+    targetsEl.appendChild(wrap);
+
+    var pingBase = _POW_URL.replace('/pow-verify', '');
+
+    fetch(pingBase + '/api/challenge').then(function (r) { return r.json(); }).then(function (data) {
+      if (!data.token || !data.image) { escalate(); return; }
+      _token = data.token;
+
+      sub.textContent = data.question;
+
+      var testImg = new Image();
+      testImg.onload = function () {
+        cells.forEach(function (c) {
+          c.img.style.backgroundImage = 'url(' + data.image + ')';
+        });
+        submitBtn.style.opacity = '1';
+        submitBtn.style.pointerEvents = 'auto';
+        bar.style.width = '40%';
+      };
+      testImg.onerror = function () {
+        _imgFailed = true;
+        sub.textContent = 'image unavailable — try another challenge';
+        hint.textContent = '';
+        submitBtn.textContent = 'skip';
+        submitBtn.style.opacity = '1';
+        submitBtn.style.pointerEvents = 'auto';
+      };
+      testImg.src = data.image;
+    }).catch(function () { escalate(); });
+
+    submitBtn.addEventListener('click', function () {
+      if (_imgFailed) { _selected = []; showImageChallenge(); return; }
+      if (!_token) return;
+
+      submitBtn.style.opacity = '.5'; submitBtn.style.pointerEvents = 'none';
+      bar.style.width = '70%';
+
+      fetch(pingBase + '/api/challenge-verify', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ token: _token, selected: _selected }),
+      }).then(function (r) { return r.text(); }).then(function (t) {
+        var raw = t.startsWith(")]}'\n") ? t.slice(5) : t;
+        var result = JSON.parse(raw)[0];
+
+        if (result === 1) {
+          setVerifying();
+          setTimeout(setSuccess, 1000);
+        } else if (result === 2) {
+          _token = null; _selected = []; showImageChallenge(); // expired, reload
+        } else {
+          attempts2++;
+          if (attempts2 >= 3) { escalate(); return; }
+          hint.textContent = 'incorrect — try again';
+          hint.style.color = '#ef4444';
+          cells.forEach(function (c) { c.sel.style.opacity = '0'; c.check.style.opacity = '0'; });
+          _selected = [];
+          setTimeout(function () {
+            hint.textContent = 'click each matching square, then verify';
+            hint.style.color = '#3d4f63';
+            submitBtn.style.opacity = '1'; submitBtn.style.pointerEvents = 'auto';
+          }, 1000);
+        }
+      }).catch(function () {
+        escalate();
+      });
+    });
+  }
+
   function showWordChallenge() {
     var WORDS = [
       'river', 'cloud', 'seven', 'plant', 'frame', 'table', 'stone', 'light', 'brush', 'dream',
@@ -935,6 +1075,7 @@ export function runChallenge(onPass, onFail) {
     shield.style.color = '#ef4444';
     shield.innerHTML = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg>';
 
+    d.title = '⊘ access blocked';
     title.textContent = 'access blocked';
     title.style.color = '#ef4444';
     sub.textContent = 'too many failed attempts. open a new tab to try again.';

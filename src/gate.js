@@ -20,7 +20,7 @@ import permBlockCss from './styles/perm-block.css?raw';
         g.setAttribute('role', 'alertdialog');
         g.setAttribute('aria-modal', 'true');
         g.setAttribute('aria-label', 'Access blocked');
-        g.innerHTML = '<div style="background:#0c1018;border:0.5px solid rgba(239,68,68,.15);border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center"><div style="width:44px;height:44px;border-radius:50%;background:rgba(239,68,68,.06);border:0.5px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#ef4444"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><p style="font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px">access blocked</p><p style="font-size:11px;color:#3d4f63;line-height:1.65;margin:0 0 18px">close this tab and reopen to try again.</p><div style="height:2px;background:#ef4444;border-radius:1px"></div><p style="font-size:10px;color:#1e2738;margin-top:18px">protected by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p></div>';
+        g.innerHTML = '<div style="background:#0c1018;border:0.5px solid rgba(239,68,68,.15);border-top:1.5px solid #ef4444;border-radius:14px;padding:28px 24px;max-width:300px;width:100%;text-align:center"><div style="width:44px;height:44px;border-radius:50%;background:rgba(239,68,68,.06);border:0.5px solid rgba(239,68,68,.2);display:flex;align-items:center;justify-content:center;margin:0 auto 16px;color:#ef4444"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="4.93" y1="4.93" x2="19.07" y2="19.07"/></svg></div><p style="font-size:14px;font-weight:500;color:#cdd6e0;margin:0 0 5px">access blocked</p><p style="font-size:11px;color:#3d4f63;line-height:1.65;margin:0">close this tab and reopen to try again.</p></div>';
         d.body.style.overflow = 'hidden';
         d.body.appendChild(g);
       }
@@ -41,7 +41,6 @@ import permBlockCss from './styles/perm-block.css?raw';
         '<p id="_vfgate_title" aria-live="polite">checking your browser</p>' +
         '<p id="_vfgate_sub" aria-live="polite">this may take a moment</p>' +
         '<div id="_vfgate_bw"><div id="_vfgate_bar"></div></div>' +
-        '<p id="_vfgate_attr">protected by <span onclick="_vshowAbout()" style="cursor:pointer;text-decoration:underline;text-underline-offset:2px">verifi</span></p>' +
       '</div>';
     d.body.style.overflow = 'hidden';
     d.body.appendChild(g);

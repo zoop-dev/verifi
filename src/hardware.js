@@ -3,6 +3,7 @@ import { _vP } from './storage.js';
 import { _vbayes } from './nn.js';
 import { _vsave } from './storage.js';
 import { _vupdScore, _vupdSc } from './telemetry.js';
+import { _vaccel, _vptr, _vtouchdur, _vvkb } from './mobile.js';
 
 var _vHwDone = false;
 
@@ -136,6 +137,13 @@ export function _vhw() {
       _vsave(); _vupdSc();
     }, 2000);
   }
+  if (_vIsMobile) {
+    _vptr();
+    _vtouchdur();
+    _vvkb();
+    _vaccel();
+  }
+
   _vsave(); _vupdSc();
 }
 

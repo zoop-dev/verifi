@@ -1,5 +1,16 @@
 var CHANGES = [
   {
+    version: '1.9.0',
+    date: '2026-08-03',
+    items: [
+      { tag: 'new', text: 'image selection challenge — a 3×3 grid where you pick all cells matching the prompt (bicycles, traffic lights, fire hydrants, etc.). statically bundled, no external dependencies, server-side verified with a signed token.' },
+      { tag: 'new', text: 'mobile-specific signals: accelerometer variance, pointer/touch media query consistency, touch duration distribution, and virtual keyboard detection. desktop signals (mouse tremor, scroll micro-patterns, curvature) no longer count against mobile scores, and vice versa.' },
+      { tag: 'chg', text: 'ping and challenge-verify responses now use the )]}\'\\n obfuscation prefix so the format is not trivially parseable as json from outside the client.' },
+      { tag: 'chg', text: 'the fullscreen challenge changes the page title to "⚠️ verifying…" while active and restores it after. blocks permanently show "⊘ access blocked".' },
+      { tag: 'chg', text: 'redesigned the about verifi popup — shield icon, privacy list with icons, cleaner layout.' },
+    ]
+  },
+  {
     version: '1.8.2',
     date: '2026-08-02',
     items: [

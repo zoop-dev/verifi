@@ -44,9 +44,7 @@ export async function onRequestPost({ request, env }) {
         const fp = await lookupFingerprint(body.fingerprint_id, env);
         if (fp) {
           if (isBanned(fp)) {
-            return new Response(JSON.stringify({ flags: ['banned'], penalty: -1, dc, fast_challenge: false }), {
-              status: 200, headers: { ...CORS, 'Content-Type': 'application/json' },
-            });
+            return pingResp([['banned'], -1, dc ? 1 : 0, 0]);
           }
           flags.push(...(fp.flags || []));
           penalty += fingerprintPenalty(fp);
@@ -73,12 +71,14 @@ export async function onRequestPost({ request, env }) {
       await bumpFail(body.site_id);
     }
 
-    return new Response(JSON.stringify({ flags, penalty, dc, fast_challenge }), {
-      status: 200, headers: { ...CORS, 'Content-Type': 'application/json' },
-    });
+    return pingResp([flags, penalty, dc ? 1 : 0, fast_challenge ? 1 : 0]);
   } catch (e) {
-    return new Response(JSON.stringify({ flags: [], penalty: 0, dc: false, fast_challenge: false }), {
-      status: 200, headers: { ...CORS, 'Content-Type': 'application/json' },
-    });
+    return pingResp([[], 0, 0, 0]);
   }
+}
+
+function pingResp(data) {
+  return new Response(")]}'\n" + JSON.stringify(data), {
+    status: 200, headers: { ...CORS, 'Content-Type': 'text/plain' },
+  });
 }

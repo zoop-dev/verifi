@@ -119,19 +119,22 @@ export function initFingerprint() {
             if (r.status === 403) {
               state._vfSiteInvalid = true;
               _vtoast('⚠', "verifi wasn't configured for this domain, nothing will be pushed to the cloud", { header: 'Invalid Domain', duration: 8000 });
-              return {};
+              return null;
             }
-            return r.json();
+            return r.text().then(function (t) {
+              return JSON.parse(t.startsWith(")]}'\n") ? t.slice(5) : t);
+            });
           }).then(function (data) {
-            if (data.penalty) {
-              _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + data.penalty));
+            if (!data) return;
+            var flags = data[0] || [], penalty = data[1] || 0, dc = data[2], fast = data[3];
+            if (penalty) {
+              _vP.hp = Math.max(0.01, Math.min(0.99, _vP.hp + penalty));
               _vsave(); _vupdSc();
             }
-            if (data.flags && data.flags.length) {
-              state._vIpFlags = [...new Set([...state._vIpFlags, ...data.flags])];
+            if (flags.length) {
+              state._vIpFlags = [...new Set([...state._vIpFlags, ...flags])];
             }
-            if (data.dc) state._vIpFlags = [...new Set([...state._vIpFlags, 'fast_challenge'])];
-            if (data.fast_challenge) state._vIpFlags = [...new Set([...state._vIpFlags, 'fast_challenge'])];
+            if (dc || fast) state._vIpFlags = [...new Set([...state._vIpFlags, 'fast_challenge'])];
           }).catch(function () {});
         } catch (e) {}
       });

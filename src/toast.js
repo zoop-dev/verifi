@@ -12,10 +12,10 @@ export function _vtoast(icon, message, opts) {
   var duration = (opts && opts.duration) || 4000;
 
   var el = document.createElement('div');
-  el.style.cssText = 'background:#0c1018;border:0.5px solid #1e2738;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;max-width:280px;pointer-events:auto;opacity:0;transform:translateX(-16px);transition:opacity .2s ease,transform .2s ease;box-shadow:0 4px 24px rgba(0,0,0,.4)';
+  el.style.cssText = 'background:#0c1018;border:0.5px solid #1e2738;border-radius:14px;padding:12px 14px;display:flex;align-items:center;gap:12px;max-width:300px;pointer-events:auto;opacity:0;transform:translateX(-16px);transition:opacity .2s ease,transform .2s ease;box-shadow:0 4px 24px rgba(0,0,0,.4);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif';
 
   var iconEl = document.createElement('div');
-  iconEl.style.cssText = 'width:36px;height:36px;flex-shrink:0;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;font-size:16px;color:#00c8ff';
+  iconEl.style.cssText = 'width:44px;height:44px;flex-shrink:0;border-radius:50%;background:rgba(0,200,255,.06);border:0.5px solid rgba(0,200,255,.2);display:flex;align-items:center;justify-content:center;font-size:18px;color:#00c8ff';
   iconEl.textContent = icon;
 
   var textEl = document.createElement('div');

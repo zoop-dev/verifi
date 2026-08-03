@@ -15,20 +15,23 @@ export var _vDwB = [], _vScrollMicro = [], _vLastScrollY = 0, _vLastScrollT = 0,
 export var _vPasteNoType = false;
 export var _vLastKeyT = 0, _vPasteEvents = 0, _vTypeBeforePaste = 0;
 
+var _DESKTOP_SIGS = ['tr', 'sc', 'cl', 'ks', 'jt', 'vel', 'dw', 'mc', 'md', 'ft'];
+var _MOBILE_SIGS  = ['to', 'sc', 'cl', 'ks', 'jt', 'vel', 'dw', 'acc', 'ptr', 'tdur', 'vkb', 'ft'];
+var _SHARED_HW    = ['gpu', 'jtr', 'aud', 'batt', 'media', 'mem', 'raf', 'font'];
+
 export function _vupdScore() {
-  var sigs = [_vP.sig.tr, _vP.sig.sc, _vP.sig.cl, _vP.sig.ks, _vP.sig.jt, _vP.sig.to, _vP.sig.vel, _vP.sig.dw, _vP.sig.mc, _vP.sig.md, _vP.sig.ft].filter(Boolean);
-  sigs.forEach(function (s) { if (s && s.c > 0.2) _vP.hp = _vbayes(_vP.hp, s.s / 100, s.c) });
+  var keys = (_vIsMobile ? _MOBILE_SIGS : _DESKTOP_SIGS).concat(_SHARED_HW);
+  var sigs = keys.map(function (k) { return _vP.sig[k]; }).filter(Boolean);
+  sigs.forEach(function (s) { if (s && s.c > 0.2) _vP.hp = _vbayes(_vP.hp, s.s / 100, s.c); });
   if (_vSeq.length >= 4) _vP.hp = _vbayes(_vP.hp, _vinfer(_vSeq), 0.2);
 
   (function () {
     try { if (navigator.webdriver) _vP.hp = _vbayes(_vP.hp, 0, 0.7); } catch (e) {}
     try { if (w.outerWidth === 0 && w.outerHeight === 0) _vP.hp = _vbayes(_vP.hp, 0, 0.6); } catch (e) {}
-
   })();
 
-  var behSigs = _vIsMobile
-    ? [_vP.sig.sc, _vP.sig.cl, _vP.sig.to, _vP.sig.vel].filter(Boolean)
-    : [_vP.sig.tr, _vP.sig.sc, _vP.sig.cl, _vP.sig.vel].filter(Boolean);
+  var behKeys = _vIsMobile ? ['sc', 'cl', 'to', 'vel'] : ['tr', 'sc', 'cl', 'vel'];
+  var behSigs = behKeys.map(function (k) { return _vP.sig[k]; }).filter(Boolean);
   var allZero = behSigs.every(function (s) { return s.c < 0.05 });
   var elapsed = (Date.now() - (_vStart || Date.now())) / 1000;
   if (allZero && elapsed > 10) _vP.hp = _vbayes(_vP.hp, 0.2, _vIsMobile ? 0.15 : 0.3);
