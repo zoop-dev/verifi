@@ -235,8 +235,12 @@ export function runChallenge(onPass, onFail) {
     holdBtn.addEventListener('pointercancel', onPointerUp);
   }
 
+  var _lvl2Cleanup = null;
+
   function showHardChallenge() {
     stage = 1;
+    var kbf = d.getElementById('_vf_kbfallback');
+    if (kbf) kbf.style.display = 'none';
     var types = ['draw', 'slider', 'dots', 'dial', 'trace'];
     var pick = types[Math.floor(Math.random() * types.length)];
     if (pick === 'slider') showSliderChallenge();
@@ -247,6 +251,8 @@ export function runChallenge(onPass, onFail) {
   }
 
   function showFinalChallenge() {
+    if (_lvl2Cleanup) { try { _lvl2Cleanup(); } catch (e) {} _lvl2Cleanup = null; }
+    attempts2 = 0;
     if (Math.random() < 0.5) showImageChallenge();
     else showWordChallenge();
   }
@@ -379,6 +385,12 @@ export function runChallenge(onPass, onFail) {
     d.addEventListener('touchmove', onMove, { passive: false });
     d.addEventListener('mouseup', onEnd);
     d.addEventListener('touchend', onEnd);
+    _lvl2Cleanup = function () {
+      d.removeEventListener('mousemove', onMove);
+      d.removeEventListener('touchmove', onMove);
+      d.removeEventListener('mouseup', onEnd);
+      d.removeEventListener('touchend', onEnd);
+    };
   }
 
   var _reloadCount = 0;
@@ -482,6 +494,12 @@ export function runChallenge(onPass, onFail) {
     sliderEl.addEventListener('touchstart', onStart, { passive: false });
     d.addEventListener('touchmove', onMove, { passive: false });
     d.addEventListener('touchend', onEnd);
+    _lvl2Cleanup = function () {
+      d.removeEventListener('mousemove', onMove);
+      d.removeEventListener('mouseup', onEnd);
+      d.removeEventListener('touchmove', onMove);
+      d.removeEventListener('touchend', onEnd);
+    };
   }
 
 
@@ -676,6 +694,12 @@ export function runChallenge(onPass, onFail) {
     }
     d.addEventListener('mouseup', onEnd);
     d.addEventListener('touchend', onEnd);
+    _lvl2Cleanup = function () {
+      d.removeEventListener('mousemove', onDialMove);
+      d.removeEventListener('touchmove', onDialMove);
+      d.removeEventListener('mouseup', onEnd);
+      d.removeEventListener('touchend', onEnd);
+    };
   }
 
   function showTraceChallenge() {
@@ -784,6 +808,12 @@ export function runChallenge(onPass, onFail) {
     d.addEventListener('touchmove', onMove, { passive: false });
     d.addEventListener('mouseup', onEnd);
     d.addEventListener('touchend', onEnd);
+    _lvl2Cleanup = function () {
+      d.removeEventListener('mousemove', onMove);
+      d.removeEventListener('touchmove', onMove);
+      d.removeEventListener('mouseup', onEnd);
+      d.removeEventListener('touchend', onEnd);
+    };
   }
 
   function showImageChallenge() {
