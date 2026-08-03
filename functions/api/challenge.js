@@ -25,16 +25,17 @@ export async function onRequestOptions() {
   return new Response(null, { status: 204, headers: CORS });
 }
 
-export async function onRequestGet({ env }) {
+export async function onRequestGet({ request, env }) {
   const c = CHALLENGES[Math.floor(Math.random() * CHALLENGES.length)];
   const secret = env.CHALLENGE_SECRET || 'dev-secret';
   const exp = Date.now() + 300_000;
   const payload = JSON.stringify({ id: c.id, ans: c.ans, exp });
   const sig = await sign(payload, secret);
   const token = btoa(payload) + '.' + sig;
+  const origin = new URL(request.url).origin;
 
-  return new Response(JSON.stringify({ question: c.q, image: c.img, token }), {
+  return new Response(")]}'\n" + JSON.stringify([c.q, origin + c.img, token]), {
     status: 200,
-    headers: { ...CORS, 'Content-Type': 'application/json' },
+    headers: { ...CORS, 'Content-Type': 'text/plain' },
   });
 }

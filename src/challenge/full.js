@@ -887,16 +887,18 @@ export function runChallenge(onPass, onFail) {
 
     var pingBase = _POW_URL.replace('/pow-verify', '');
 
-    fetch(pingBase + '/api/challenge').then(function (r) { return r.json(); }).then(function (data) {
-      if (!data.token || !data.image) { escalate(); return; }
-      _token = data.token;
+    fetch(pingBase + '/api/challenge').then(function (r) { return r.text(); }).then(function (t) {
+      var data = JSON.parse(t.startsWith(")]}'\n") ? t.slice(5) : t);
+      var question = data[0], image = data[1], token = data[2];
+      if (!token || !image) { escalate(); return; }
+      _token = token;
 
-      sub.textContent = data.question;
+      sub.textContent = question;
 
       var testImg = new Image();
       testImg.onload = function () {
         cells.forEach(function (c) {
-          c.img.style.backgroundImage = 'url(' + data.image + ')';
+          c.img.style.backgroundImage = 'url(' + image + ')';
         });
         submitBtn.style.opacity = '1';
         submitBtn.style.pointerEvents = 'auto';
@@ -910,7 +912,7 @@ export function runChallenge(onPass, onFail) {
         submitBtn.style.opacity = '1';
         submitBtn.style.pointerEvents = 'auto';
       };
-      testImg.src = data.image;
+      testImg.src = image;
     }).catch(function () { escalate(); });
 
     submitBtn.addEventListener('click', function () {
