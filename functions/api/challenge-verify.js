@@ -1,16 +1,16 @@
+import { byId, verifySig } from '../_challenges.js';
+
 const CORS = {
   'Access-Control-Allow-Origin': '*',
   'Access-Control-Allow-Methods': 'POST, OPTIONS',
   'Access-Control-Allow-Headers': 'Content-Type',
 };
 
-async function verify(payload, sig, secret) {
-  const key = await crypto.subtle.importKey(
-    'raw', new TextEncoder().encode(secret),
-    { name: 'HMAC', hash: 'SHA-256' }, false, ['verify']
-  );
-  const sigBytes = new Uint8Array(sig.match(/.{2}/g).map(h => parseInt(h, 16)));
-  return crypto.subtle.verify('HMAC', key, sigBytes, new TextEncoder().encode(payload));
+function resp(code) {
+  return new Response(")]}'\n[" + code + "]", {
+    status: 200,
+    headers: { ...CORS, 'Content-Type': 'text/plain', 'Cache-Control': 'no-store' },
+  });
 }
 
 export async function onRequestOptions() {
@@ -21,30 +21,29 @@ export async function onRequestPost({ request, env }) {
   const body = await request.json().catch(() => ({}));
   const { token, selected } = body;
 
-  if (!token || !Array.isArray(selected)) {
-    return new Response(")]}'\n[0]", { status: 200, headers: { ...CORS, 'Content-Type': 'text/plain' } });
-  }
+  if (typeof token !== 'string' || !Array.isArray(selected)) return resp(0);
 
   try {
     const [payloadB64, sig] = token.split('.');
+    if (!payloadB64 || !sig) return resp(0);
+
     const payload = atob(payloadB64);
     const secret = env.CHALLENGE_SECRET || 'dev-secret';
-    const ok = await verify(payload, sig, secret);
-    if (!ok) return new Response(")]}'\n[0]", { status: 200, headers: { ...CORS, 'Content-Type': 'text/plain' } });
+    if (!await verifySig(payload, sig, secret)) return resp(0);
 
     const data = JSON.parse(payload);
-    if (Date.now() > data.exp) {
-      return new Response(")]}'\n[2]", { status: 200, headers: { ...CORS, 'Content-Type': 'text/plain' } }); // expired
-    }
+    if (Date.now() > data.exp) return resp(2); // expired
 
-    const ans = data.ans.slice().sort((a, b) => a - b);
-    const sel = selected.slice().sort((a, b) => a - b);
+    const c = byId(data.id);
+    if (!c) return resp(0);
+
+    // answer lives server-side only; the token never carries it
+    const ans = c.ans.slice().sort((a, b) => a - b);
+    const sel = [...new Set(selected)].sort((a, b) => a - b);
     const pass = ans.length === sel.length && ans.every((v, i) => v === sel[i]);
 
-    return new Response(")]}'\n[" + (pass ? '1' : '0') + "]", {
-      status: 200, headers: { ...CORS, 'Content-Type': 'text/plain' },
-    });
+    return resp(pass ? 1 : 0);
   } catch {
-    return new Response(")]}'\n[0]", { status: 200, headers: { ...CORS, 'Content-Type': 'text/plain' } });
+    return resp(0);
   }
 }
